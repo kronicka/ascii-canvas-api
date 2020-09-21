@@ -1,4 +1,5 @@
 from typing import Tuple
+from collections import deque
 
 
 class Canvas:
@@ -78,30 +79,6 @@ class Canvas:
         for char in range(start, end):
             self.canvas[upper_border][char] = fill_symbol
             self.canvas[lower_border][char] = fill_symbol
-
-    def __fill_rectangle(
-            self,
-            x: int, y: int,
-            fill_symbol: str, initial_symbol: str
-    ) -> None:
-        """
-        A DFS solution; works, but exceeds the number of recursive calls for large canvases.
-        To be replaced with something better soon.
-        """
-        try:
-            if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
-                return
-
-            if self.canvas[y][x] == initial_symbol:
-                self.canvas[y][x] = fill_symbol
-
-                self.__fill_rectangle(x, y + 1, fill_symbol, initial_symbol)
-                self.__fill_rectangle(x + 1, y, fill_symbol, initial_symbol)
-                self.__fill_rectangle(x, y - 1, fill_symbol, initial_symbol)
-                self.__fill_rectangle(x - 1, y, fill_symbol, initial_symbol)
-
-        except Exception as e:
-            print(f'Something went wrong: {e}')
 
     def paint_rectangle(
         self,
@@ -185,14 +162,44 @@ class Canvas:
         :param y:           y-coordinate of any point on the entity to fill in
         :param fill_symbol: the symbol to fill the entity with
         """
-        initial_symbol = self.canvas[y][x]
+        try:
+            if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
+                print(
+                    f'The canvas is {self.rows}x{self.cols}. Try passing valid coordinates :-)'
+                )
 
-        self.__fill_rectangle(
-            x=x,
-            y=y,
-            fill_symbol=fill_symbol,
-            initial_symbol=initial_symbol
-        )
+            initial_symbol: str = self.canvas[y][x]
+            neighbours: deque = deque()
+
+            self.canvas[y][x] = fill_symbol
+            neighbours.append((y, x))
+
+            while neighbours:
+                curr_y, curr_x = neighbours.popleft()
+
+                up: int = curr_y - 1
+                down: int = curr_y + 1
+                left: int = curr_x - 1
+                right: int = curr_x + 1
+
+                if up >= 0 and self.canvas[up][curr_x] == initial_symbol:
+                    self.canvas[up][curr_x] = fill_symbol
+                    neighbours.append((up, curr_x))
+
+                if down < self.rows and self.canvas[down][curr_x] == initial_symbol:
+                    self.canvas[down][curr_x] = fill_symbol
+                    neighbours.append((down, curr_x))
+
+                if left >= 0 and self.canvas[curr_y][left] == initial_symbol:
+                    self.canvas[curr_y][left] = fill_symbol
+                    neighbours.append((curr_y, left))
+
+                if right < self.cols and self.canvas[curr_y][right] == initial_symbol:
+                    self.canvas[curr_y][right] = fill_symbol
+                    neighbours.append((curr_y, right))
+
+        except Exception as e:
+            print(f'Something went wrong: {e}')
 
     def print_canvas(
             self,
@@ -231,7 +238,7 @@ if __name__ == '__main__':
     ```
     """
 
-    canvas: Canvas = Canvas(rows=100, cols=100, fill_symbol='-')
+    canvas: Canvas = Canvas(rows=1000, cols=1000, fill_symbol=' ')
 
     rx_1, ry_1, rwidth_1, rheight_1, fill_symbol_1, outline_symbol_1 = 3, 2, 5, 3, 'x', '@'
     canvas.paint_rectangle(
@@ -253,7 +260,8 @@ if __name__ == '__main__':
         outline_symbol=outline_symbol_2
     )
 
-    # canvas.fill_rectangle(0, 0, 'M')
+    canvas.fill_rectangle(0, 0, '-')
+    canvas.fill_rectangle(4, 3, 'M')
 
     crop_bottom = max(
         ry_1 + rheight_1 + 1,
