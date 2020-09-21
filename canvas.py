@@ -19,6 +19,23 @@ class Canvas:
 
         self.canvas: list = [[fill_symbol] * self.cols for _ in range(self.rows)]
 
+    def __check_rectangle_in_range(
+            self,
+            first_row: int, last_row: int,
+            first_col: int, last_col: int
+    ) -> bool:
+        """
+        Check if the specified rectangle can be placed on the canvas of the current size.
+
+        :param first_row: index of the upper border of the rectangle
+        :param last_row:  index of the lower border of the rectangle
+        :param first_col: index of the rightmost border of the rectangle
+        :param last_col:  index of the leftmost border of the rectangle
+
+        :return:          true if the rectangle can be added to the current canvas, false if not
+        """
+        return (0 < first_row and last_row < self.rows) and (0 < first_col and last_col < self.cols)
+
     def __calculate_canvas_size(self) -> Tuple[int, int]:
         """
         NOTE: This is a placeholder function for now.
@@ -62,6 +79,30 @@ class Canvas:
             self.canvas[upper_border][char] = fill_symbol
             self.canvas[lower_border][char] = fill_symbol
 
+    def __fill_rectangle(
+            self,
+            x: int, y: int,
+            fill_symbol: str, initial_symbol: str
+    ) -> None:
+        """
+        A DFS solution; works, but exceeds the number of recursive calls for large canvases.
+        To be replaced with something better soon.
+        """
+        try:
+            if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
+                return
+
+            if self.canvas[y][x] == initial_symbol:
+                self.canvas[y][x] = fill_symbol
+
+                self.__fill_rectangle(x, y + 1, fill_symbol, initial_symbol)
+                self.__fill_rectangle(x + 1, y, fill_symbol, initial_symbol)
+                self.__fill_rectangle(x, y - 1, fill_symbol, initial_symbol)
+                self.__fill_rectangle(x - 1, y, fill_symbol, initial_symbol)
+
+        except Exception as e:
+            print(f'Something went wrong: {e}')
+
     def paint_rectangle(
         self,
         x: int, y: int, width: int, height: int,
@@ -82,6 +123,20 @@ class Canvas:
         first_col: int = x
         last_col: int = width + x
 
+        in_range_check = self.__check_rectangle_in_range(
+            first_row=first_row,
+            last_row=last_row,
+            first_col=first_col,
+            last_col=last_col
+        )
+
+        if not in_range_check:
+            print(
+                f'This rectangle will not fit on the current canvas. '
+                f'Please specify the rectangle within this range: {self.rows}x{self.cols}'
+            )
+            return
+
         if not outline_symbol and not fill_symbol:
             print(
                 'No outline or fill symbol has been specified for the rectangle. '
@@ -98,7 +153,8 @@ class Canvas:
                 fill_symbol=outline_symbol
             )
 
-            first_row += 1  # needed to avoid adding vertical borders covered by horizontal
+            # These are needed to avoid filling the points already covered by adding horizontal borders
+            first_row += 1
             last_row -= 1
 
             if not fill_symbol:
@@ -129,9 +185,19 @@ class Canvas:
         :param y:           y-coordinate of any point on the entity to fill in
         :param fill_symbol: the symbol to fill the entity with
         """
-        pass
+        initial_symbol = self.canvas[y][x]
 
-    def print_canvas(self, crop_bottom: int = 0, crop_right: int = 0) -> None:
+        self.__fill_rectangle(
+            x=x,
+            y=y,
+            fill_symbol=fill_symbol,
+            initial_symbol=initial_symbol
+        )
+
+    def print_canvas(
+            self,
+            crop_bottom: int = 0, crop_right: int = 0
+    ) -> None:
         """
         Print the contents of the current canvas.
 
@@ -177,7 +243,7 @@ if __name__ == '__main__':
         outline_symbol=outline_symbol_1
     )
 
-    rx_2, ry_2, rwidth_2, rheight_2, fill_symbol_2, outline_symbol_2 = 10, 3, 14, 6, 'O', 'X'
+    rx_2, ry_2, rwidth_2, rheight_2, fill_symbol_2, outline_symbol_2 = 10, 3, 9, 6, 'O', 'X'
     canvas.paint_rectangle(
         x=rx_2,
         y=ry_2,
@@ -186,6 +252,8 @@ if __name__ == '__main__':
         fill_symbol=fill_symbol_2,
         outline_symbol=outline_symbol_2
     )
+
+    # canvas.fill_rectangle(0, 0, 'M')
 
     crop_bottom = max(
         ry_1 + rheight_1 + 1,
