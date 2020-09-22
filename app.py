@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException
 
 
 app: Flask = CanvasAPI.create_app()
-canvas: Canvas = Canvas(rows=100, cols=100, fill_symbol=' ')
+canvas: Canvas = Canvas(rows=35, cols=35, fill_symbol=' ')
 
 
 @app.errorhandler(Exception)

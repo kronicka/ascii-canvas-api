@@ -54,6 +54,10 @@ class Canvas:
         """
         Crop canvas just enough to fit in currently painted rectangles.
         """
+        if not self.painted_lowest_border and not self.painted_rightmost_border:
+            # Return if no rectangles have previously been placed on the canvas
+            return
+
         self.rows = self.painted_lowest_border
         self.cols = self.painted_rightmost_border
         self.canvas = self.canvas[:self.rows, :self.cols]
@@ -168,7 +172,7 @@ class Canvas:
                 for curr_x in range(first_col, last_col):
                     self.canvas[curr_y][curr_x] = fill_symbol
 
-    def fill_rectangle(
+    def fill_area(
         self,
         x: int, y: int, fill_symbol: str
     ) -> None:

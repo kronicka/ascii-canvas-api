@@ -38,4 +38,8 @@ class FillOperationSchema(ma.Schema):
     """
     A Marshmallow schema to validate structural correctness of the passed in Fill operation properties.
     """
-    pass
+    x = fields.Int()
+    y = fields.Int()
+    fill_symbol = fields.String(
+        validate=Length(min=1, max=1)
+    )

@@ -107,8 +107,6 @@ def test_fixture_3():
     """
     Test fixture 3 separated into a function.
 
-    TODO: Fix the canvas cropping according to this test fixture.
-
     Input:
     - Rectangle at `[14, 0]` with width `7`, height `6`, outline character: none, fill: `.`
     - Rectangle at `[0, 3]` with width `8`, height `4`, outline character: `O`, fill: `none`
@@ -158,7 +156,7 @@ def test_fixture_3():
         outline_symbol=outline_symbol_3
     )
 
-    canvas.fill_rectangle(0, 0, '-')
+    canvas.fill_area(0, 0, '-')
 
     print('\nThis is Test Fixture 3: ')
     canvas.print_canvas()

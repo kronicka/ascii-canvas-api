@@ -2,7 +2,7 @@ import marshmallow_dataclass
 from marshmallow import Schema
 
 from api.blueprints import canvas_api
-from api.schemas import RectangleSchema, CanvasSchema
+from api.schemas import RectangleSchema, CanvasSchema, FillOperationSchema
 from app import canvas
 
 from flask import Response, request, make_response
@@ -22,7 +22,7 @@ def paint_rectangle(**kwargs) -> Response:
     rect_schema: RectangleSchema = RectangleSchema()
     canvas_schema: Schema = marshmallow_dataclass.class_schema(CanvasSchema)()
 
-    rectangle = rect_schema.load(json_payload)
+    rectangle: dict = rect_schema.load(json_payload)
 
     canvas.paint_rectangle(
         x=rectangle['x'],
@@ -34,6 +34,7 @@ def paint_rectangle(**kwargs) -> Response:
     )
 
     canvas.crop_canvas()
+    canvas.print_canvas()   # Print the canvas in the console for each call
 
     json_canvas: dict = canvas_schema.dump(canvas)
     data: dict = {
@@ -50,8 +51,31 @@ def paint_rectangle(**kwargs) -> Response:
     rule='/api/v1/canvas/fill',
     methods=['PUT']
 )
-def fill_points(**kwargs) -> Response:
+def fill_area(**kwargs) -> Response:
     """
     Flood fill the points on the canvas, starting from the specified coordinate.
     """
-    pass
+    json_payload = request.json
+
+    fill_schema: FillOperationSchema = FillOperationSchema()
+    canvas_schema: Schema = marshmallow_dataclass.class_schema(CanvasSchema)()
+
+    fill: dict = fill_schema.load(json_payload)
+
+    canvas.fill_area(
+        x=fill['x'],
+        y=fill['y'],
+        fill_symbol=fill['fill_symbol']
+    )
+
+    canvas.print_canvas()   # Print the canvas in the console for each call
+
+    json_canvas: dict = canvas_schema.dump(canvas)
+    data: dict = {
+        'data': json_canvas['canvas']['data'],
+        'errors': None
+    }
+
+    response = make_response(data, status.HTTP_200_OK)
+
+    return response
