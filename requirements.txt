@@ -1,2 +1,16 @@
 # Math and computation
 numpy
+
+
+# Web
+flask
+flask-api
+flask-cors
+
+werkzeug
+
+
+# Serializers
+flask-marshmallow
+marshmallow
+marshmallow-numpy
