@@ -1,4 +1,4 @@
-from canvas import Canvas
+from api.canvas.canvas import Canvas
 
 
 def test_fixture_1():

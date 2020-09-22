@@ -1,5 +1,5 @@
-from typing import Tuple
 from collections import deque
+from typing import Tuple
 import numpy as np
 
 
@@ -50,7 +50,7 @@ class Canvas:
         """
         pass
 
-    def __crop_canvas(self) -> None:
+    def crop_canvas(self) -> None:
         """
         Crop canvas just enough to fit in currently painted rectangles.
         """
@@ -186,7 +186,7 @@ class Canvas:
                 )
 
             # Crop the canvas to avoid filling the points outside or around the visual boundaries of the canvas
-            self.__crop_canvas()
+            self.crop_canvas()
 
             initial_symbol: str = self.canvas[y][x]
             neighbours: deque = deque()
@@ -235,7 +235,7 @@ class Canvas:
         """
         # Crop canvas before printing if it hasn't just been cropped by fill_rectangle
         if self.rows != self.painted_lowest_border or self.cols != self.painted_rightmost_border:
-            self.__crop_canvas()
+            self.crop_canvas()
 
         for row in range(self.rows):
             for col in range(self.cols):
