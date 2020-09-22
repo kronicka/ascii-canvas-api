@@ -1,5 +1,6 @@
 from typing import Tuple
 from collections import deque
+import numpy as np
 
 
 class Canvas:
@@ -18,7 +19,12 @@ class Canvas:
         self.rows: int = rows
         self.cols: int = cols
 
-        self.canvas: list = [[fill_symbol] * self.cols for _ in range(self.rows)]
+        self.painted_lowest_border: int = 0
+        self.painted_rightmost_border: int = 0
+
+        self.canvas: np.array = np.array(
+            [[fill_symbol] * self.cols for _ in range(self.rows)]
+        )
 
     def __check_rectangle_in_range(
             self,
@@ -43,6 +49,14 @@ class Canvas:
         Calculate the minimum desired size of the canvas based on the drawn rectangles.
         """
         pass
+
+    def __crop_canvas(self) -> None:
+        """
+        Crop canvas just enough to fit in currently painted rectangles.
+        """
+        self.rows = self.painted_lowest_border
+        self.cols = self.painted_rightmost_border
+        self.canvas = self.canvas[:self.rows, :self.cols]
 
     def __fill_vertical_borders(
         self,
@@ -121,6 +135,10 @@ class Canvas:
             )
             return
 
+        # Keep track of the lowest rightmost border painted to be able to crop the canvas accordingly
+        self.painted_lowest_border = max(self.painted_lowest_border, last_row)
+        self.painted_rightmost_border = max(self.painted_rightmost_border, last_col)
+
         if outline_symbol:
             self.__fill_horizontal_borders(
                 start=first_col,
@@ -157,8 +175,6 @@ class Canvas:
         """
         Fill an entity on the canvas with the specified symbol.
 
-        TODO: Crop canvas before filling. Resize canvas if new rectangles are to be added
-
         :param x:           x-coordinate of any point on the entity to fill in
         :param y:           y-coordinate of any point on the entity to fill in
         :param fill_symbol: the symbol to fill the entity with
@@ -168,6 +184,9 @@ class Canvas:
                 print(
                     f'The canvas is {self.rows}x{self.cols}. Try passing valid coordinates :-)'
                 )
+
+            # Crop the canvas to avoid filling the points outside or around the visual boundaries of the canvas
+            self.__crop_canvas()
 
             initial_symbol: str = self.canvas[y][x]
             neighbours: deque = deque()
@@ -210,20 +229,15 @@ class Canvas:
         """
         self.canvas = [[fill_symbol] * self.cols for _ in range(self.rows)]
 
-    def print_canvas(
-            self,
-            crop_bottom: int = 0, crop_right: int = 0
-    ) -> None:
+    def print_canvas(self) -> None:
         """
         Print the contents of the current canvas.
-
-        :param crop_bottom: line to crop the canvas horizontally at
-        :param crop_right:  column to crop the canvas vertically at
         """
-        rows = self.rows - (self.rows - crop_bottom) or self.rows
-        cols = self.cols - (self.cols - crop_right) or self.cols
+        # Crop canvas before printing if it hasn't just been cropped by fill_rectangle
+        if self.rows != self.painted_lowest_border or self.cols != self.painted_rightmost_border:
+            self.__crop_canvas()
 
-        for row in range(rows):
-            for col in range(cols):
+        for row in range(self.rows):
+            for col in range(self.cols):
                 print(self.canvas[row][col], end=' ')
             print('\r')

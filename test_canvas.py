@@ -43,17 +43,8 @@ def test_fixture_1():
         outline_symbol=outline_symbol_2
     )
 
-    crop_bottom = max(
-        ry_1 + rheight_1,
-        ry_2 + rheight_2
-    )
-    crop_right = max(
-        rx_1 + rwidth_1,
-        rx_2 + rwidth_2
-    )
-
     print('\nThis is Test Fixture 1: ')
-    canvas.print_canvas(crop_bottom=crop_bottom, crop_right=crop_right)
+    canvas.print_canvas()
 
 
 def test_fixture_2():
@@ -108,19 +99,8 @@ def test_fixture_2():
         outline_symbol=outline_symbol_3
     )
 
-    crop_bottom = max(
-        ry_1 + rheight_1,
-        ry_2 + rheight_2,
-        ry_3 + rheight_3
-    )
-    crop_right = max(
-        rx_1 + rwidth_1,
-        rx_2 + rwidth_2,
-        rx_3 + rwidth_3
-    )
-
     print('\nThis is Test Fixture 2: ')
-    canvas.print_canvas(crop_bottom=crop_bottom, crop_right=crop_right)
+    canvas.print_canvas()
 
 
 def test_fixture_3():
@@ -180,19 +160,8 @@ def test_fixture_3():
 
     canvas.fill_rectangle(0, 0, '-')
 
-    crop_bottom = max(
-        ry_1 + rheight_1,
-        ry_2 + rheight_2,
-        ry_3 + rheight_3
-    )
-    crop_right = max(
-        rx_1 + rwidth_1,
-        rx_2 + rwidth_2,
-        rx_3 + rwidth_3
-    )
-
     print('\nThis is Test Fixture 3: ')
-    canvas.print_canvas(crop_bottom=crop_bottom, crop_right=crop_right)
+    canvas.print_canvas()
 
 
 if __name__ == '__main__':
