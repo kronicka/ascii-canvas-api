@@ -6,7 +6,7 @@ class Canvas:
     """ A class representing an ASCII canvas. """
     def __init__(
             self,
-            rows: int, cols: int, fill_symbol: str = ' '
+            rows: int = 100, cols: int = 100, fill_symbol: str = ' '
     ) -> None:
         """
         Initialize an empty canvas with the specified height and width.
@@ -35,7 +35,7 @@ class Canvas:
 
         :return:          true if the rectangle can be added to the current canvas, false if not
         """
-        return (0 < first_row and last_row < self.rows) and (0 < first_col and last_col < self.cols)
+        return (0 <= first_row and last_row < self.rows) and (0 <= first_col and last_col < self.cols)
 
     def __calculate_canvas_size(self) -> Tuple[int, int]:
         """
@@ -134,22 +134,21 @@ class Canvas:
             first_row += 1
             last_row -= 1
 
-            if not fill_symbol:
-                self.__fill_vertical_borders(
-                    start=first_row,
-                    end=last_row,
-                    leftmost_border=first_col,
-                    rightmost_border=last_col - 1,
-                    fill_symbol=outline_symbol
-                )
+            self.__fill_vertical_borders(
+                start=first_row,
+                end=last_row,
+                leftmost_border=first_col,
+                rightmost_border=last_col - 1,
+                fill_symbol=outline_symbol
+            )
+
+            first_col += 1
+            last_col -= 1
 
         if fill_symbol:
             for curr_y in range(first_row, last_row):
                 for curr_x in range(first_col, last_col):
-                    if outline_symbol and (curr_x == first_col or curr_x == last_col - 1):
-                        self.canvas[curr_y][curr_x] = outline_symbol
-                    else:
-                        self.canvas[curr_y][curr_x] = fill_symbol
+                    self.canvas[curr_y][curr_x] = fill_symbol
 
     def fill_rectangle(
         self,
@@ -157,6 +156,8 @@ class Canvas:
     ) -> None:
         """
         Fill an entity on the canvas with the specified symbol.
+
+        TODO: Crop canvas before filling. Resize canvas if new rectangles are to be added
 
         :param x:           x-coordinate of any point on the entity to fill in
         :param y:           y-coordinate of any point on the entity to fill in
@@ -201,6 +202,14 @@ class Canvas:
         except Exception as e:
             print(f'Something went wrong: {e}')
 
+    def clear_canvas(self, fill_symbol: str = ' '):
+        """
+        Clear the entirety of canvas.
+
+        :param fill_symbol: an optional symbol to fill all canvas with
+        """
+        self.canvas = [[fill_symbol] * self.cols for _ in range(self.rows)]
+
     def print_canvas(
             self,
             crop_bottom: int = 0, crop_right: int = 0
@@ -218,58 +227,3 @@ class Canvas:
             for col in range(cols):
                 print(self.canvas[row][col], end=' ')
             print('\r')
-
-
-if __name__ == '__main__':
-    """
-    - x=3 y=2 width=5 height=3 fill=`@` outline=None 
-    - x=10 y=3 width=14 height=6 fill=`O` outline=`X`
-
-    ```
-
-
-       @@@@@
-       @xxx@  XXXXXXXXXXXXXX
-       @@@@@  XOOOOOOOOOOOOX
-              XOOOOOOOOOOOOX
-              XOOOOOOOOOOOOX
-              XOOOOOOOOOOOOX
-              XXXXXXXXXXXXXX
-    ```
-    """
-
-    canvas: Canvas = Canvas(rows=1000, cols=1000, fill_symbol=' ')
-
-    rx_1, ry_1, rwidth_1, rheight_1, fill_symbol_1, outline_symbol_1 = 3, 2, 5, 3, 'x', '@'
-    canvas.paint_rectangle(
-        x=rx_1,
-        y=ry_1,
-        width=rwidth_1,
-        height=rheight_1,
-        fill_symbol=fill_symbol_1,
-        outline_symbol=outline_symbol_1
-    )
-
-    rx_2, ry_2, rwidth_2, rheight_2, fill_symbol_2, outline_symbol_2 = 10, 3, 9, 6, 'O', 'X'
-    canvas.paint_rectangle(
-        x=rx_2,
-        y=ry_2,
-        width=rwidth_2,
-        height=rheight_2,
-        fill_symbol=fill_symbol_2,
-        outline_symbol=outline_symbol_2
-    )
-
-    canvas.fill_rectangle(0, 0, '-')
-    canvas.fill_rectangle(4, 3, 'M')
-
-    crop_bottom = max(
-        ry_1 + rheight_1 + 1,
-        ry_2 + rheight_2 + 1
-    )
-    crop_right = max(
-        rx_1 + rwidth_1 + 1,
-        rx_2 + rwidth_2 + 1
-    )
-
-    canvas.print_canvas(crop_bottom=crop_bottom, crop_right=crop_right)
