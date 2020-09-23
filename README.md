@@ -31,9 +31,12 @@ These are the endpoints to interact with via the client of your choice.
 **Expected JSON Payload**:  
 ```
 {
-	"x": <int>,
-	"y": <int>,
-	"fill_symbol": <str of length 1>
+    "x": <int>,
+    "y": <int>,
+    "width": <int>,
+    "height": <int>,
+    "fill_symbol": <str of length 1: optional>,
+    "outline_symbol": <str of length 1: optional>
 }
 ```
 
@@ -42,12 +45,9 @@ These are the endpoints to interact with via the client of your choice.
 **Expected JSON Payload**:  
 ```
 {
-	"x": <int>,
-	"y": <int>,
-	"width": <int>,
-	"height": <int>,
-	"fill_symbol": <str of length 1: optional>,
-	"outline_symbol": <str of length 1: optional>
+    "x": <int>,
+    "y": <int>,
+    "fill_symbol": <str of length 1>
 }
 ```
 
