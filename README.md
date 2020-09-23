@@ -8,13 +8,13 @@ Spin up the server to manipulate the Canvas through RESTful endpoints and retrie
 1. Clone this repository.
 2. Install **Python** [3.7.4](https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.6.pkg) (or above).
 > **NOTE**: This code has not yet been tested with any versions of Python higher than [3.7.6](https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.6.pkg), but it is likely to work with all stable releases above 3.7.
-3. Install **virtualenv** by running this command in the terminal:
+3. Install **virtualenv** by running this command in the terminal:  
  `pip install virtualenv`
-4.  Create a virtual environment in the root of the repo, activate it, and install the required dependencies:
-`virtualenv --python=python3 venv`
-`. venv/bin/activate`
-`pip install -r requirements.txt`
-5. Run the server!
+4.  Create a virtual environment in the root of the repo, activate it, and install the required dependencies:  
+`virtualenv --python=python3 venv`  
+`. venv/bin/activate`  
+`pip install -r requirements.txt`  
+5. Run the server!  
 `python3 app.py`
 > **NOTE**: The server runs on 127.0.0.1:5000 by default.
 
@@ -27,7 +27,7 @@ These are the endpoints to interact with via the client of your choice.
 
 ### Full Reference
 #### Paint a Rectangle
-**PUT** `/api/v1/canvas/paint`
+**PUT** `/api/v1/canvas/paint`  
 **Expected JSON Payload**:  
 ```
 {
@@ -38,7 +38,7 @@ These are the endpoints to interact with via the client of your choice.
 ```
 
 #### Fill an Area
-**PUT** `/api/v1/canvas/fill`
+**PUT** `/api/v1/canvas/fill`  
 **Expected JSON Payload**:  
 ```
 {
