@@ -18,17 +18,17 @@ def handle_uncaught_exception(error: Exception) -> Tuple[Response, int]:
 
     :param error: an exception object
     """
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    error_string = f'Uncaught Exception: {str(error)}'
+    status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
+    error_string: str = f'Uncaught Exception: {str(error)}'
 
     if isinstance(error, HTTPException):
         status_code = error.code
 
-    data = {
+    data: dict = {
         'data': None,
         'errors': error_string
     }
-    response = make_response(
+    response: Tuple[Response, int] = make_response(
         data, status_code
     )
 

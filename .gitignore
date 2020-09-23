@@ -75,3 +75,6 @@ dmypy.json
 
 # PyCharm
 .idea/
+
+# Resources
+api/canvas/canvas.csv
