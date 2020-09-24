@@ -78,3 +78,6 @@ dmypy.json
 
 # Resources
 api/canvas/canvas.csv
+
+# Redis
+dump.rdb

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The ASCII Canvas</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
+</head>
+<body>
+    <div id="main">
+        <p><b>the world's okayest ascii canvas</b></p>
+        <table id="canvas"></table>
+    </div>
+    <script>
+
+        /**
+         * Create an HTML table from a provided 2d array.
+         */
+        function createCanvas(canvasData) {
+            let table = document.createElement('table');
+            let tBody = document.createElement('tbody');
+
+            canvasData.forEach((rowData) => {
+                let row = document.createElement('tr');
+
+                rowData.forEach((cellData) => {
+                    let cell = document.createElement('td');
+
+                    // Empty cells break the table render, substitute the value in them for nbsp;
+                    if (!cellData) {
+                        cellData = '\xa0';
+                    }
+
+                    cell.appendChild(document.createTextNode(cellData));
+                    row.appendChild(cell);
+                });
+
+                tBody.appendChild(row);
+
+            });
+            table.appendChild(tBody);
+            return table.innerHTML
+        }
+
+        /**
+         * Retrieve messages from the SSE stream, parse them into a 2d array,
+         * and insert the resulting ASCII Canvas as an HTML table that instant.
+         */
+        function streamCanvas() {
+            // Attach an EventSource to listen to any messages coming from the stream
+            let source = new EventSource('/stream');
+            let canvasHTMLTable = document.getElementById('canvas');
+
+            // Once the message is received, turn it into a 2d array
+            source.onmessage = (e) => {
+                let canvasArr = e.data.split("\\n").map(
+                    (e) => { return e.split(" ").map(String); }
+                );
+
+                // Create an HTML table out of that 2d array
+                canvasHTMLTable.innerHTML = createCanvas(canvasArr);
+            };
+        }
+
+        streamCanvas();
+
+    </script>
+</body>
+</html>

@@ -7,10 +7,11 @@ from pathlib import Path
 from numpy import loadtxt, savetxt
 
 from api.blueprints import canvas_api
+from api.helpers.sse_events import event_stream
 from api.schemas import RectangleSchema, CanvasSchema, FillOperationSchema
-from app import canvas
+from app import canvas, strict_redis
 
-from flask import Response, request, make_response
+from flask import Response, request, make_response, render_template
 from flask_api import status
 
 
@@ -49,6 +50,30 @@ def save_canvas_after_request(response: Response) -> Response:
     return response
 
 
+@canvas_api.route(rule='/stream')
+def stream_changes() -> Response:
+    """
+    Stream any Canvas modifications from the server side directly to the JS template.
+    """
+    return Response(
+        event_stream(),
+        mimetype='text/event-stream'
+    )
+
+
+@canvas_api.route(
+    rule='/',
+    methods=['GET']
+)
+def get_index_page(**kwargs) -> Tuple[Response, int]:
+    """
+    Render the Main Page, containing the canvas.
+    """
+    return render_template(
+        'index.html'
+    )
+
+
 @canvas_api.route(
     rule='/api/v1/canvas/paint',
     methods=['PUT']
@@ -73,15 +98,14 @@ def paint_rectangle(**kwargs) -> Tuple[Response, int]:
         outline_symbol=rectangle['outline_symbol']
     )
 
-    canvas.crop_canvas()
-    canvas.print_canvas()   # Print the canvas in the console for each call
-
     json_canvas: dict = canvas_schema.dump(canvas)
     data: dict = {
         'data': json_canvas['canvas']['data'],
         'errors': None
     }
 
+    str_canvas: str = canvas.to_string()
+    strict_redis.publish('canvas_changes', str_canvas)
     response: Tuple[Response, int] = make_response(data, status.HTTP_200_OK)
 
     return response
@@ -108,14 +132,14 @@ def fill_area(**kwargs) -> Tuple[Response, int]:
         fill_symbol=fill['fill_symbol']
     )
 
-    canvas.print_canvas()   # Print the canvas in the console for each call
-
     json_canvas: dict = canvas_schema.dump(canvas)
     data: dict = {
         'data': json_canvas['canvas']['data'],
         'errors': None
     }
 
+    str_canvas: str = canvas.to_string()
+    strict_redis.publish('canvas_changes', str_canvas)
     response: Tuple[Response, int] = make_response(data, status.HTTP_200_OK)
 
     return response

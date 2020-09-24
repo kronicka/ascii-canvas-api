@@ -189,11 +189,12 @@ class Canvas:
                     f'The canvas is {self.rows}x{self.cols}. Try passing valid coordinates :-)'
                 )
 
-            # Crop the canvas to avoid filling the points outside or around the visual boundaries of the canvas
-            self.crop_canvas()
-
             initial_symbol: str = self.canvas[y][x]
             neighbours: deque = deque()
+
+            if initial_symbol == fill_symbol:
+                # No need to fill if the initial symbol matches the fill symbol.
+                return
 
             self.canvas[y][x] = fill_symbol
             neighbours.append((y, x))
@@ -233,14 +234,23 @@ class Canvas:
         """
         self.canvas = [[fill_symbol] * self.cols for _ in range(self.rows)]
 
+    def to_string(self) -> str:
+        """
+        Return the current Canvas as its string representation.
+        """
+        str_canvas: str = ''
+
+        for row in range(self.rows):
+            str_canvas += ' '.join(self.canvas[row])
+            str_canvas += '\\n'
+
+        print(str_canvas)
+        return str_canvas
+
     def print_canvas(self) -> None:
         """
         Print the contents of the current canvas.
         """
-        # Crop canvas before printing if it hasn't just been cropped by fill_rectangle
-        if self.rows != self.painted_lowest_border or self.cols != self.painted_rightmost_border:
-            self.crop_canvas()
-
         for row in range(self.rows):
             for col in range(self.cols):
                 print(self.canvas[row][col], end=' ')

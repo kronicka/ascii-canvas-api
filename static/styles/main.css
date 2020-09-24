@@ -1,0 +1,41 @@
+body {
+    background: black;
+    color: honeydew;
+    font: 20px/2 monospace;
+    margin: auto;
+}
+
+p {
+    margin-top: 0;
+    padding: 1em 2em 1em 2em;
+}
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    padding: 0.1rem;
+    border-spacing: 0.1rem;
+    width: 100%;
+}
+
+table td {
+    width: 5%;
+    position: relative;
+    text-align: center;
+}
+
+table td:after {
+    content: '';
+    display: block;
+    margin-top: 100%;
+}
+
+table tr {
+    line-height: 5%;
+    margin-top: 10%;
+}
+
+#main {
+    background: black;
+    background: linear-gradient(0deg, rgba(0,0,0,1) 21%, rgba(13,56,56,1) 100%);
+}
