@@ -52,9 +52,11 @@ These are the endpoints to interact with via the client of your choice.
 ```
 
 ## Stuff left to do
-- Implement persistence of the Canvas on application launches [ ]
+- Implement persistence of the Canvas on application launches [x]
 - Implement proper automated tests + API tests                [ ]
 - Implement a read-only client + SSE for such client          [ ]
 - Add success/failure flags and error message propagation     [ ]
 - Reconsider Canvas cropping to be visual only                [ ]
 - Elaborate on API responses in the Full Reference doc        [ ]
+- Add a Postman collection for the requests                   [ ]
+- Put the app in a Docker                                     [ ]
