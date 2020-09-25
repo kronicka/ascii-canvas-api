@@ -26,11 +26,18 @@ def load_existing_canvas() -> None:
     if not CANVAS_FILE_PATH.exists():
         return
 
-    canvas.canvas = loadtxt(
-        str(CANVAS_FILE_PATH),
-        dtype='U',
-        delimiter=','
-    )
+    try:
+        canvas.canvas = loadtxt(
+            str(CANVAS_FILE_PATH),
+            dtype='<U1',
+            delimiter='¬',
+            comments='¤'
+        )
+    except ValueError as e:
+        print(
+            f'Something went wrong loading from the file.'
+            f' Details: {e}'
+        )
 
 
 @canvas_api.after_app_request
@@ -44,7 +51,8 @@ def save_canvas_after_request(response: Response) -> Response:
         canvas.canvas,
         header='This is a CSV representation of the latest Canvas.',
         fmt='%s',
-        delimiter=','
+        delimiter='¬',
+        comments='¤'
     )
 
     return response
@@ -78,18 +86,22 @@ def get_index_page(**kwargs) -> Tuple[Response, int]:
     rule='/api/v1/canvas/paint',
     methods=['PUT']
 )
-def paint_rectangle(**kwargs) -> Tuple[Response, int]:
+def paint_rectangle() -> Tuple[Response, int]:
     """
     Paint a rectangle with the specified parameters on a preexisting canvas.
     """
     json_payload = request.json
+    response_data: dict = {
+        'data': None,
+        'errors': None
+    }
 
     rect_schema: RectangleSchema = RectangleSchema()
     canvas_schema: Schema = class_schema(CanvasSchema)()
 
     rectangle: dict = rect_schema.load(json_payload)
 
-    canvas.paint_rectangle(
+    is_success, errors = canvas.paint_rectangle(
         x=rectangle['x'],
         y=rectangle['y'],
         width=rectangle['width'],
@@ -98,15 +110,28 @@ def paint_rectangle(**kwargs) -> Tuple[Response, int]:
         outline_symbol=rectangle['outline_symbol']
     )
 
-    json_canvas: dict = canvas_schema.dump(canvas)
-    data: dict = {
-        'data': json_canvas['canvas']['data'],
-        'errors': None
-    }
+    if not is_success:
+        response_data['errors'] = errors
+        return make_response(
+            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
-    str_canvas: str = canvas.to_string()
+    # Return a serialized JSON version of the canvas with the REST response
+    json_canvas: dict = canvas_schema.dump(canvas)
+    response_data['data'] = json_canvas['canvas']['data']
+
+    # Turn the current canvas into a string and send it to the JS client
+    str_canvas, errors = canvas.to_string()
+    if errors:
+        response_data['errors'] = errors
+        return make_response(
+            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
     strict_redis.publish('canvas_changes', str_canvas)
-    response: Tuple[Response, int] = make_response(data, status.HTTP_200_OK)
+    response: Tuple[Response, int] = make_response(
+        response_data, status.HTTP_200_OK
+    )
 
     return response
 
@@ -115,31 +140,46 @@ def paint_rectangle(**kwargs) -> Tuple[Response, int]:
     rule='/api/v1/canvas/fill',
     methods=['PUT']
 )
-def fill_area(**kwargs) -> Tuple[Response, int]:
+def fill_area() -> Tuple[Response, int]:
     """
     Flood fill the points on the canvas, starting from the specified coordinate.
     """
     json_payload = request.json
+    response_data: dict = {
+        'data': None,
+        'errors': None
+    }
 
     fill_schema: FillOperationSchema = FillOperationSchema()
     canvas_schema: Schema = class_schema(CanvasSchema)()
 
     fill: dict = fill_schema.load(json_payload)
 
-    canvas.fill_area(
+    is_success, errors = canvas.fill_area(
         x=fill['x'],
         y=fill['y'],
         fill_symbol=fill['fill_symbol']
     )
 
-    json_canvas: dict = canvas_schema.dump(canvas)
-    data: dict = {
-        'data': json_canvas['canvas']['data'],
-        'errors': None
-    }
+    if not is_success:
+        response_data['errors'] = errors
+        return make_response(
+            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
-    str_canvas: str = canvas.to_string()
+    # Return a serialized JSON version of the canvas with the REST response
+    json_canvas: dict = canvas_schema.dump(canvas)
+    response_data['data'] = json_canvas['canvas']['data']
+
+    # Turn the current canvas into a string and send it to the JS client
+    str_canvas, errors = canvas.to_string()
+    if errors:
+        response_data['errors'] = errors
+        return make_response(
+            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
     strict_redis.publish('canvas_changes', str_canvas)
-    response: Tuple[Response, int] = make_response(data, status.HTTP_200_OK)
+    response: Tuple[Response, int] = make_response(response_data, status.HTTP_200_OK)
 
     return response

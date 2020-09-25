@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Tuple
+from typing import Tuple, Union
 import numpy as np
 
 
@@ -50,7 +50,7 @@ class Canvas:
         """
         pass
 
-    def crop_canvas(self) -> None:
+    def __crop_canvas(self) -> None:
         """
         Crop canvas just enough to fit in currently painted rectangles.
         """
@@ -102,7 +102,7 @@ class Canvas:
         self,
         x: int, y: int, width: int, height: int,
         fill_symbol: str = None, outline_symbol: str = None
-    ) -> None:
+    ) -> Tuple[bool, Union[str, None]]:
         """
         Paint a rectangle on the canvas.
 
@@ -113,6 +113,9 @@ class Canvas:
         :param fill_symbol:    the symbol to fill in the rectangle with
         :param outline_symbol: the symbol for the outline
         """
+        is_success = False
+        error_message = None
+
         first_row: int = y
         last_row: int = height + y
         first_col: int = x
@@ -126,56 +129,65 @@ class Canvas:
         )
 
         if not in_range_check:
-            print(
+            error_message = (
                 f'This rectangle will not fit on the current canvas. '
                 f'Please specify the rectangle within this range: {self.rows}x{self.cols}'
             )
-            return
+            return is_success, error_message
 
         if not outline_symbol and not fill_symbol:
-            print(
+            error_message = (
                 'No outline or fill symbol has been specified for the rectangle. '
                 'Please specify fill_symbol or outline_symbol field.'
             )
-            return
+            return is_success, error_message
 
-        # Keep track of the lowest rightmost border painted to be able to crop the canvas accordingly
-        self.painted_lowest_border = max(self.painted_lowest_border, last_row)
-        self.painted_rightmost_border = max(self.painted_rightmost_border, last_col)
+        try:
+            # Keep track of the lowest rightmost border painted to be able to crop the canvas accordingly
+            self.painted_lowest_border = max(self.painted_lowest_border, last_row)
+            self.painted_rightmost_border = max(self.painted_rightmost_border, last_col)
 
-        if outline_symbol:
-            self.__fill_horizontal_borders(
-                start=first_col,
-                end=last_col,
-                upper_border=first_row,
-                lower_border=last_row - 1,
-                fill_symbol=outline_symbol
-            )
+            if outline_symbol:
+                self.__fill_horizontal_borders(
+                    start=first_col,
+                    end=last_col,
+                    upper_border=first_row,
+                    lower_border=last_row - 1,
+                    fill_symbol=outline_symbol
+                )
 
-            # These are needed to avoid filling the points already covered by adding horizontal borders
-            first_row += 1
-            last_row -= 1
+                # These are needed to avoid filling the points already covered by adding horizontal borders
+                first_row += 1
+                last_row -= 1
 
-            self.__fill_vertical_borders(
-                start=first_row,
-                end=last_row,
-                leftmost_border=first_col,
-                rightmost_border=last_col - 1,
-                fill_symbol=outline_symbol
-            )
+                self.__fill_vertical_borders(
+                    start=first_row,
+                    end=last_row,
+                    leftmost_border=first_col,
+                    rightmost_border=last_col - 1,
+                    fill_symbol=outline_symbol
+                )
 
-            first_col += 1
-            last_col -= 1
+                first_col += 1
+                last_col -= 1
 
-        if fill_symbol:
-            for curr_y in range(first_row, last_row):
-                for curr_x in range(first_col, last_col):
-                    self.canvas[curr_y][curr_x] = fill_symbol
+            if fill_symbol:
+                for curr_y in range(first_row, last_row):
+                    for curr_x in range(first_col, last_col):
+                        self.canvas[curr_y][curr_x] = fill_symbol
+
+            is_success = True
+
+        except Exception as e:
+            error_message = f'Something went wrong while attempting to paint the rectangle. ' \
+                            f'Details: {e}'
+
+        return is_success, error_message
 
     def fill_area(
         self,
         x: int, y: int, fill_symbol: str
-    ) -> None:
+    ) -> Tuple[bool, Union[str, None]]:
         """
         Fill an entity on the canvas with the specified symbol.
 
@@ -183,20 +195,24 @@ class Canvas:
         :param y:           y-coordinate of any point on the entity to fill in
         :param fill_symbol: the symbol to fill the entity with
         """
+        is_success = False
+        error_message = None
+
         try:
             if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
-                print(
+                error_message = (
                     f'The canvas is {self.rows}x{self.cols}. Try passing valid coordinates :-)'
                 )
+                return is_success, error_message
 
             initial_symbol: str = self.canvas[y][x]
-            neighbours: deque = deque()
 
             if initial_symbol == fill_symbol:
-                # No need to fill if the initial symbol matches the fill symbol.
-                return
+                is_success = True  # No need to fill if the initial symbol matches the fill symbol.
+                return is_success, error_message
 
             self.canvas[y][x] = fill_symbol
+            neighbours: deque = deque()
             neighbours.append((y, x))
 
             while neighbours:
@@ -207,6 +223,7 @@ class Canvas:
                 left: int = curr_x - 1
                 right: int = curr_x + 1
 
+                # Push the matching symbols onto the queue to see if they extend the filled area
                 if up >= 0 and self.canvas[up][curr_x] == initial_symbol:
                     self.canvas[up][curr_x] = fill_symbol
                     neighbours.append((up, curr_x))
@@ -223,8 +240,13 @@ class Canvas:
                     self.canvas[curr_y][right] = fill_symbol
                     neighbours.append((curr_y, right))
 
+            is_success = True
+
         except Exception as e:
-            print(f'Something went wrong: {e}')
+            error_message = f'Something went wrong while filling an area. ' \
+                            f'Details: {e}'
+
+        return is_success, error_message
 
     def clear_canvas(self, fill_symbol: str = ' '):
         """
@@ -232,20 +254,27 @@ class Canvas:
 
         :param fill_symbol: an optional symbol to fill all canvas with
         """
-        self.canvas = [[fill_symbol] * self.cols for _ in range(self.rows)]
+        self.canvas = np.array(
+            [[fill_symbol] * self.cols for _ in range(self.rows)]
+        )
 
-    def to_string(self) -> str:
+    def to_string(self) -> Tuple[str, Union[str, None]]:
         """
         Return the current Canvas as its string representation.
         """
         str_canvas: str = ''
+        error_message = None
 
-        for row in range(self.rows):
-            str_canvas += ' '.join(self.canvas[row])
-            str_canvas += '\\n'
+        try:
+            for row in range(self.rows):
+                str_canvas += ' '.join(self.canvas[row])
+                str_canvas += '\\n'
 
-        print(str_canvas)
-        return str_canvas
+        except Exception as e:
+            error_message = f'Turning the canvas into a string failed for the following reason: ' \
+                            f'{e}'
+
+        return str_canvas, error_message
 
     def print_canvas(self) -> None:
         """
