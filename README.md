@@ -7,16 +7,19 @@ Spin up the server to manipulate the Canvas through RESTful endpoints and retrie
 
 1. Clone this repository.
 2. Install **Python** [3.7.4](https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.6.pkg) (or above).
-> **NOTE**: This code has not yet been tested with any versions of Python higher than [3.7.6](https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.6.pkg), but it is likely to work with all stable releases above 3.7.
+> **NOTE**: This code has not yet been tested with any versions of Python other than 3.7.4, 3.7.6, and [3.8.5](https://www.python.org/downloads/release/python-385/), but it is likely to work with all stable releases above 3.7.
 3. Install **virtualenv** by running this command in the terminal:  
  `pip install virtualenv`
 4.  Create a virtual environment in the root of the repo, activate it, and install the required dependencies:  
 `virtualenv --python=python3 venv`  
 `. venv/bin/activate`  
 `pip install -r requirements.txt`  
+5. Install and run Redis:  
+`brew install redis`  
+`redis-server` (use `--daemonize yes` to run in the background)  
 5. Run the server!  
 `python3 app.py`
-> **NOTE**: The server runs on 127.0.0.1:5000 by default.
+> **NOTE**: The server runs on 127.0.0.1:1337 by default.
 
 ## API Endpoints
 
@@ -54,9 +57,9 @@ These are the endpoints to interact with via the client of your choice.
 ## Stuff left to do
 - Implement persistence of the Canvas on application launches [x]
 - Implement proper automated tests + API tests                [ ]
-- Implement a read-only client + SSE for such client          [ ]
-- Add success/failure flags and error message propagation     [ ]
-- Reconsider Canvas cropping to be visual only                [ ]
+- Implement a read-only client + SSE for such client          [x]
+- Add success/failure flags and error message propagation     [x]
+- Reconsider Canvas cropping to be visual only                [x]
 - Elaborate on API responses in the Full Reference doc        [ ]
-- Add a Postman collection for the requests                   [ ]
+- Add a Postman collection for the requests                   [x]
 - Put the app in a Docker                                     [ ]
