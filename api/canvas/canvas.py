@@ -258,24 +258,6 @@ class Canvas:
             [[fill_symbol] * self.cols for _ in range(self.rows)]
         )
 
-    def to_string(self) -> Tuple[str, Union[str, None]]:
-        """
-        Return the current Canvas as its string representation.
-        """
-        str_canvas: str = ''
-        error_message = None
-
-        try:
-            for row in range(self.rows):
-                str_canvas += ' '.join(self.canvas[row])
-                str_canvas += '\\n'
-
-        except Exception as e:
-            error_message = f'Turning the canvas into a string failed for the following reason: ' \
-                            f'{e}'
-
-        return str_canvas, error_message
-
     def print_canvas(self) -> None:
         """
         Print the contents of the current canvas.

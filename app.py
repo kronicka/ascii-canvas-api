@@ -10,7 +10,7 @@ from werkzeug.exceptions import HTTPException
 
 app: Flask = CanvasAPI.create_app()
 strict_redis: StrictRedis = StrictRedis()
-canvas: Canvas = Canvas(rows=30, cols=30, fill_symbol=' ')
+canvas: Canvas = Canvas(rows=30, cols=50, fill_symbol=' ')
 
 
 @app.errorhandler(Exception)

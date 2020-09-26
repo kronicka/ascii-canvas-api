@@ -2,22 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
     <title>The ASCII Canvas</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/main.css') }}">
 </head>
 <body>
     <div id="main">
         <p><b>the world's okayest ascii canvas</b></p>
-        <table id="canvas"></table>
+        <table id="canvas">
+            {% for row in first_canvas %}
+                <tr>
+                {% for col in row %}
+                  <td>{{ col }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
     </div>
     <script>
 
         /**
          * Create an HTML table from a provided 2d array.
          */
-        function createCanvas(canvasData) {
+        function convertCanvasToTable(canvasData) {
             let table = document.createElement('table');
-            let tBody = document.createElement('tbody');
 
             canvasData.forEach((rowData) => {
                 let row = document.createElement('tr');
@@ -25,19 +33,13 @@
                 rowData.forEach((cellData) => {
                     let cell = document.createElement('td');
 
-                    // Empty cells break the table render, substitute the value in them for nbsp;
-                    if (!cellData) {
-                        cellData = '\xa0';
-                    }
-
                     cell.appendChild(document.createTextNode(cellData));
                     row.appendChild(cell);
                 });
 
-                tBody.appendChild(row);
+                table.appendChild(row);
 
             });
-            table.appendChild(tBody);
             return table.innerHTML
         }
 
@@ -50,14 +52,10 @@
             let source = new EventSource('/stream');
             let canvasHTMLTable = document.getElementById('canvas');
 
-            // Once the message is received, turn it into a 2d array
             source.onmessage = (e) => {
-                let canvasArr = e.data.split("\\n").map(
-                    (e) => { return e.split(" ").map(String); }
-                );
-
-                // Create an HTML table out of that 2d array
-                canvasHTMLTable.innerHTML = createCanvas(canvasArr);
+                canvasArr = JSON.parse(e.data)
+                // Create an HTML table out of 2d array
+                canvasHTMLTable.innerHTML = convertCanvasToTable(canvasArr.data);
             };
         }
 

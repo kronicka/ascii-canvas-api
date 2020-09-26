@@ -1,3 +1,4 @@
+import json
 from typing import Tuple
 
 from marshmallow_dataclass import class_schema
@@ -22,6 +23,9 @@ CANVAS_FILE_PATH: Path = Path(__file__).parent / 'canvas/canvas.csv'
 def load_existing_canvas() -> None:
     """
     Load an existing canvas if this is not the first time the application is launched.
+
+    NOTE:   Delimiters and comments are non-ASCII characters, so that they are not confused
+          with symbols on the Canvas.
     """
     if not CANVAS_FILE_PATH.exists():
         return
@@ -45,6 +49,9 @@ def save_canvas_after_request(response: Response) -> Response:
     """
     Save the Canvas object into a CSV file after request to recover it
     on the next application launch.
+
+    NOTE:   Delimiters and comments are non-ASCII characters, so that they are not confused
+          with symbols on the Canvas.
     """
     savetxt(
         str(CANVAS_FILE_PATH),
@@ -73,12 +80,18 @@ def stream_changes() -> Response:
     rule='/',
     methods=['GET']
 )
-def get_index_page(**kwargs) -> Tuple[Response, int]:
+def get_index_page() -> Tuple[Response, int]:
     """
     Render the Main Page, containing the canvas.
+
+    NOTE:   `first_canvas` field is only gonna be rendered once per canvas page reload.
+          It is needed for the initial render, not caused by messages being published
+          onto the stream.
+            A cached version of `first_canvas` should be used, if the canvas hasn't changed
+          before the reload.
     """
     return render_template(
-        'index.html'
+        'index.html', first_canvas=canvas.canvas
     )
 
 
@@ -120,15 +133,10 @@ def paint_rectangle() -> Tuple[Response, int]:
     json_canvas: dict = canvas_schema.dump(canvas)
     response_data['data'] = json_canvas['canvas']['data']
 
-    # Turn the current canvas into a string and send it to the JS client
-    str_canvas, errors = canvas.to_string()
-    if errors:
-        response_data['errors'] = errors
-        return make_response(
-            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-    strict_redis.publish('canvas_changes', str_canvas)
+    strict_redis.publish(
+        channel='canvas_changes',
+        message=json.dumps(json_canvas['canvas'])
+    )
     response: Tuple[Response, int] = make_response(
         response_data, status.HTTP_200_OK
     )
@@ -171,15 +179,10 @@ def fill_area() -> Tuple[Response, int]:
     json_canvas: dict = canvas_schema.dump(canvas)
     response_data['data'] = json_canvas['canvas']['data']
 
-    # Turn the current canvas into a string and send it to the JS client
-    str_canvas, errors = canvas.to_string()
-    if errors:
-        response_data['errors'] = errors
-        return make_response(
-            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-    strict_redis.publish('canvas_changes', str_canvas)
+    strict_redis.publish(
+        channel='canvas_changes',
+        message=json.dumps(json_canvas['canvas'])
+    )
     response: Tuple[Response, int] = make_response(response_data, status.HTTP_200_OK)
 
     return response

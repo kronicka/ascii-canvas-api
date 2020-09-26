@@ -13,13 +13,13 @@ p {
 table {
     table-layout: fixed;
     border-collapse: collapse;
-    padding: 0.1rem;
     border-spacing: 0.1rem;
-    width: 100%;
+    margin-left: 5%;
+    width: 90%;
 }
 
 table td {
-    width: 5%;
+    width: 3%;
     position: relative;
     text-align: center;
 }
@@ -31,8 +31,8 @@ table td:after {
 }
 
 table tr {
-    line-height: 5%;
-    margin-top: 10%;
+    line-height: 3%;
+    height: 3%;
 }
 
 #main {

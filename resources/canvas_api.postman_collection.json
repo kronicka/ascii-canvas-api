@@ -1,0 +1,82 @@
+{
+	"info": {
+		"_postman_id": "dac3d89f-7cde-4060-9af0-b10a7aaa92e2",
+		"name": "Canvas API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Flood Fill an Area",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"x\": 0,\n    \"y\": 0,\n    \"fill_symbol\": \"-\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:1337/api/v1/canvas/fill",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "1337",
+					"path": [
+						"api",
+						"v1",
+						"canvas",
+						"fill"
+					]
+				},
+				"description": "Fill an area of the canvas, starting at the specified coordinate."
+			},
+			"response": []
+		},
+		{
+			"name": "Paint a Rectangle",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"x\": 3,\n    \"y\": 5,\n    \"width\": 20,\n    \"height\": 5,\n    \"fill_symbol\": \"@\",\n    \"outline_symbol\": \"#\"\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:1337/api/v1/canvas/paint",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "1337",
+					"path": [
+						"api",
+						"v1",
+						"canvas",
+						"paint"
+					]
+				},
+				"description": "Modify the Canvas to contain the Rectangle with the specified properties."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
