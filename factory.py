@@ -13,6 +13,8 @@ class FlaskAppFactory:
         Create a Flask application object with the specified configs, extensions, and blueprints.
         """
         app = Flask(__name__)
+        app.config['TEMPLATES_AUTO_RELOAD'] = True
+
         CORS(app)
 
         cls.initialize_extensions(app)

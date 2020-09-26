@@ -14,3 +14,7 @@ werkzeug
 flask-marshmallow
 marshmallow
 marshmallow-numpy
+
+
+# Storage
+redis

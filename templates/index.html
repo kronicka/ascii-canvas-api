@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+    <title>The ASCII Canvas</title>
+</head>
+<body>
+    <div id="main">
+        <p><b>the world's okayest ascii canvas</b></p>
+        <table id="canvas">
+            {% for row in first_canvas %}
+                <tr>
+                {% for col in row %}
+                  <td>{{ col }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <script>
+
+        /**
+         * Create an HTML table from a provided 2d array.
+         */
+        function convertCanvasToTable(canvasData) {
+            let table = document.createElement('table');
+
+            canvasData.forEach((rowData) => {
+                let row = document.createElement('tr');
+
+                rowData.forEach((cellData) => {
+                    let cell = document.createElement('td');
+
+                    cell.appendChild(document.createTextNode(cellData));
+                    row.appendChild(cell);
+                });
+
+                table.appendChild(row);
+
+            });
+            return table.innerHTML
+        }
+
+        /**
+         * Retrieve messages from the SSE stream, parse them into a 2d array,
+         * and insert the resulting ASCII Canvas as an HTML table that instant.
+         */
+        function streamCanvas() {
+            // Attach an EventSource to listen to any messages coming from the stream
+            let source = new EventSource('/stream');
+            let canvasHTMLTable = document.getElementById('canvas');
+
+            source.onmessage = (e) => {
+                canvasArr = JSON.parse(e.data)
+                // Create an HTML table out of 2d array
+                canvasHTMLTable.innerHTML = convertCanvasToTable(canvasArr.data);
+            };
+        }
+
+        streamCanvas();
+
+    </script>
+</body>
+</html>

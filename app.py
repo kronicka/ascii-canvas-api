@@ -3,12 +3,14 @@ from api.canvas.canvas import Canvas
 
 from flask import Response, Flask, make_response
 from flask_api import status
+from redis import StrictRedis
 from typing import Tuple
 from werkzeug.exceptions import HTTPException
 
 
 app: Flask = CanvasAPI.create_app()
-canvas: Canvas = Canvas(rows=35, cols=35, fill_symbol=' ')
+strict_redis: StrictRedis = StrictRedis()
+canvas: Canvas = Canvas(rows=30, cols=50, fill_symbol=' ')
 
 
 @app.errorhandler(Exception)
@@ -39,4 +41,4 @@ if __name__ == '__main__':
     """
     Start the Flask server.
     """
-    app.run()
+    app.run('127.0.0.1', port=1337)

@@ -78,3 +78,9 @@ dmypy.json
 
 # Resources
 api/canvas/canvas.csv
+
+# Redis
+dump.rdb
+
+# MacOS
+.DS_Store
