@@ -14,7 +14,7 @@ strict_redis: StrictRedis = StrictRedis(
     host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT']
 )
 
-canvas: Canvas = Canvas(rows=30, cols=50, fill_symbol=' ')
+canvas: Canvas = Canvas(rows=9, cols=22, fill_symbol=' ')
 
 
 @app.errorhandler(Exception)

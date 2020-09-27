@@ -84,3 +84,6 @@ dump.rdb
 
 # MacOS
 .DS_Store
+
+# Testing
+api/tests/.pytest_cache
