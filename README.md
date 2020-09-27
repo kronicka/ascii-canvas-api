@@ -20,7 +20,7 @@ That's it!
 
 1. Clone this repository.
 2. Install **Python** [3.7.4](https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.6.pkg) (or above).
-> **NOTE**: This code has not yet been tested with any versions of Python other than 3.7.4, 3.7.6, and [3.8.5](https://www.python.org/downloads/release/python-385/), but it is likely to work with all stable releases above 3.7.
+> **NOTE**: This code has not been manually tested with any versions of Python other than 3.7.4, 3.7.6, and [3.8.5](https://www.python.org/downloads/release/python-385/), but it is highly likely to work with all stable releases above 3.7. 
 3. Install **virtualenv** by running this command in the terminal:  
  `pip install virtualenv`
 4.  Create a virtual environment in the root of the repo, activate it, and install the required dependencies:  
