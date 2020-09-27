@@ -1,14 +1,14 @@
 from api.canvas.canvas import Canvas
-from api.tests.helpers import load_fixture, Rectangle, Fill, CanvasParams
+from tests.helpers import load_fixture, Rectangle, Fill, CanvasParams
 
 from pathlib import Path
 import pytest
 import numpy as np
 
 
-fixture_path_1 = Path(__file__).parent / 'fixtures/expected_canvas_1.csv'
-fixture_path_2 = Path(__file__).parent / 'fixtures/expected_canvas_2.csv'
-fixture_path_3 = Path(__file__).parent / 'fixtures/expected_canvas_3.csv'
+fixture_path_1: Path = Path(__file__).parent / 'fixtures/expected_canvas_1.csv'
+fixture_path_2: Path = Path(__file__).parent / 'fixtures/expected_canvas_2.csv'
+fixture_path_3: Path = Path(__file__).parent / 'fixtures/expected_canvas_3.csv'
 
 
 expected_fixture_1: np.array = load_fixture(fixture_path_1)

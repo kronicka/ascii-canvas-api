@@ -38,7 +38,8 @@ That's it!
 
 ## API Endpoints
 
-These are the endpoints to interact with via the client of your choice.
+These are the endpoints to interact with via the client of your choice.  
+A Postman Collection for the following is available in `resources` directory.  
 ### Quick Reference
 * [**PUT** `/api/v1/canvas/paint`](#paint-a-rectangle) - Modify the Canvas by painting a Rectangle on it.
 * [**PUT** `/api/v1/canvas/fill`](#fill-an-area) - Modify the Canvas by filling an Area of points, starting at a specified point.
@@ -111,14 +112,13 @@ The current Canvas, fully filled with `-`, assuming previously empty Canvas:
     ],
     "errors": null
 } 
-```
-
-## Stuff left to do
-- Implement persistence of the Canvas on application launches [x]
-- Implement proper automated tests + API tests                [ ]
-- Implement a read-only client + SSE for such client          [x]
-- Add success/failure flags and error message propagation     [x]
-- Reconsider Canvas cropping to be visual only                [x]
-- Elaborate on API responses in the Full Reference doc        [x]
-- Add a Postman collection for the requests                   [x]
-- Put the app in a Docker                                     [x]
+```  
+## Running Tests
+### Running tests locally
+Running tests locally can be done via running the following command in the root of the repo:  
+`python3 -m pytest`  
+> **NOTE**: This is assuming the server was set up correctly, and the virtualenv is activated.
+### Running tests in a Docker
+Running test with the Docker set up can be done via running the following command:  
+`docker exec -it canvas_api python3 -m pytest`
+> **NOTE**: This is assuming the server was set up correctly, using Docker, and the `canvas_api` container is running.
