@@ -9,7 +9,7 @@ Spin up the server to manipulate the Canvas through RESTful endpoints and retrie
 1. Clone this repository.
 2. Install the latest version of [Docker](https://docs.docker.com/get-docker/).
 > **NOTE**: Docker Compose is included in Docker Desktop for MacOS and Windows, but may require additional installs for Linux or alternative cases. See [this page](https://docs.docker.com/compose/install/) for additional info.
-3. Run the app by using this command in the terminal:  
+3. Run the app by running this command in the root of the repo:  
 `docker-compose up` (use `-d` to run in the background)
 > **NOTE**: The server runs on `localhost:1337` by default and should be accessible from a browser.
 
