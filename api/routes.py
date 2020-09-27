@@ -119,8 +119,8 @@ def paint_rectangle() -> Tuple[Response, int]:
         y=rectangle['y'],
         width=rectangle['width'],
         height=rectangle['height'],
-        fill_symbol=rectangle['fill_symbol'],
-        outline_symbol=rectangle['outline_symbol']
+        fill_symbol=rectangle.get('fill_symbol', None),
+        outline_symbol=rectangle.get('outline_symbol', None)
     )
 
     if not is_success:

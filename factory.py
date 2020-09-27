@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -13,7 +14,9 @@ class FlaskAppFactory:
         Create a Flask application object with the specified configs, extensions, and blueprints.
         """
         app = Flask(__name__)
-        app.config['TEMPLATES_AUTO_RELOAD'] = True
+
+        environment_config: str = os.environ.get('CONFIGURATION_ENV', 'config.Config')
+        app.config.from_object(environment_config)
 
         CORS(app)
 

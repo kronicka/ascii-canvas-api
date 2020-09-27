@@ -9,7 +9,11 @@ from werkzeug.exceptions import HTTPException
 
 
 app: Flask = CanvasAPI.create_app()
-strict_redis: StrictRedis = StrictRedis()
+
+strict_redis: StrictRedis = StrictRedis(
+    host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT']
+)
+
 canvas: Canvas = Canvas(rows=30, cols=50, fill_symbol=' ')
 
 
@@ -41,4 +45,7 @@ if __name__ == '__main__':
     """
     Start the Flask server.
     """
-    app.run('127.0.0.1', port=1337)
+    host = app.config['FLASK_HOST']
+    port = app.config['FLASK_PORT']
+
+    app.run(host=host, port=port)
