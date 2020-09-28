@@ -18,11 +18,11 @@ expected_fixture_3: np.array = load_fixture(fixture_path_3)
 
 fixture_1 = (
     [
-        Rectangle(3, 2, 5, 3, 'x', '@'),
+        Rectangle(3, 2, 5, 3, 'X', '@'),
         Rectangle(10, 3, 14, 6, 'O', 'X')
     ],
     None,
-    CanvasParams(10, 25, ' '),
+    CanvasParams(9, 24, ' '),
     expected_fixture_1
 )
 
@@ -33,7 +33,7 @@ fixture_2 = (
         Rectangle(5, 5, 5, 3, 'X', 'X')
     ],
     None,
-    CanvasParams(9, 22, ' '),
+    CanvasParams(8, 21, ' '),
     expected_fixture_2
 )
 
@@ -44,7 +44,7 @@ fixture_3 = (
         Rectangle(5, 5, 5, 3, 'X', 'X')
     ],
     Fill(0, 0, '-'),
-    CanvasParams(9, 22, ' '),
+    CanvasParams(8, 21, ' '),
     expected_fixture_3
 )
 

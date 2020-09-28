@@ -19,8 +19,8 @@ class Canvas:
         self.rows: int = rows
         self.cols: int = cols
 
-        self.painted_lowest_border: int = 0
-        self.painted_rightmost_border: int = 0
+        self.__painted_lowest_border: int = 0
+        self.__painted_rightmost_border: int = 0
 
         self.canvas: np.array = np.array(
             [[fill_symbol] * self.cols for _ in range(self.rows)]
@@ -54,12 +54,12 @@ class Canvas:
         """
         Crop canvas just enough to fit in currently painted rectangles.
         """
-        if not self.painted_lowest_border and not self.painted_rightmost_border:
+        if not self.__painted_lowest_border and not self.__painted_rightmost_border:
             # Return if no rectangles have previously been placed on the canvas
             return
 
-        self.rows = self.painted_lowest_border
-        self.cols = self.painted_rightmost_border
+        self.rows = self.__painted_lowest_border
+        self.cols = self.__painted_rightmost_border
         self.canvas = self.canvas[:self.rows, :self.cols]
 
     def __fill_vertical_borders(
@@ -76,7 +76,7 @@ class Canvas:
         :param rightmost_border: x-position of the last column to fill
         :param fill_symbol:      symbol to fill the column with
         """
-        for char in range(start, end):
+        for char in range(start, end + 1):
             self.canvas[char][leftmost_border] = fill_symbol
             self.canvas[char][rightmost_border] = fill_symbol
 
@@ -94,7 +94,7 @@ class Canvas:
         :param lower_border: number of the bottom line to fill in
         :param fill_symbol:  symbol to fill the line with
         """
-        for char in range(start, end):
+        for char in range(start, end + 1):
             self.canvas[upper_border][char] = fill_symbol
             self.canvas[lower_border][char] = fill_symbol
 
@@ -117,9 +117,9 @@ class Canvas:
         error_message = None
 
         first_row: int = y
-        last_row: int = height + y
+        last_row: int = height + y - 1
         first_col: int = x
-        last_col: int = width + x
+        last_col: int = width + x - 1
 
         in_range_check = self.__check_rectangle_in_range(
             first_row=first_row,
@@ -131,7 +131,7 @@ class Canvas:
         if not in_range_check:
             error_message = (
                 f'This rectangle will not fit on the current canvas. '
-                f'Please specify the rectangle within this range: {self.rows}x{self.cols}'
+                f'Please specify the rectangle within this range: {self.cols}x{self.rows}'
             )
             return is_success, error_message
 
@@ -144,15 +144,15 @@ class Canvas:
 
         try:
             # Keep track of the lowest rightmost border painted to be able to crop the canvas accordingly
-            self.painted_lowest_border = max(self.painted_lowest_border, last_row)
-            self.painted_rightmost_border = max(self.painted_rightmost_border, last_col)
+            self.__painted_lowest_border = max(self.__painted_lowest_border, last_row)
+            self.__painted_rightmost_border = max(self.__painted_rightmost_border, last_col)
 
             if outline_symbol:
                 self.__fill_horizontal_borders(
                     start=first_col,
                     end=last_col,
                     upper_border=first_row,
-                    lower_border=last_row - 1,
+                    lower_border=last_row,
                     fill_symbol=outline_symbol
                 )
 
@@ -164,7 +164,7 @@ class Canvas:
                     start=first_row,
                     end=last_row,
                     leftmost_border=first_col,
-                    rightmost_border=last_col - 1,
+                    rightmost_border=last_col,
                     fill_symbol=outline_symbol
                 )
 
@@ -172,8 +172,8 @@ class Canvas:
                 last_col -= 1
 
             if fill_symbol:
-                for curr_y in range(first_row, last_row):
-                    for curr_x in range(first_col, last_col):
+                for curr_y in range(first_row, last_row + 1):
+                    for curr_x in range(first_col, last_col + 1):
                         self.canvas[curr_y][curr_x] = fill_symbol
 
             is_success = True
@@ -201,7 +201,7 @@ class Canvas:
         try:
             if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
                 error_message = (
-                    f'The canvas is {self.rows}x{self.cols}. Try passing valid coordinates :-)'
+                    f'The canvas is {self.cols}x{self.rows}. Try passing valid coordinates :-)'
                 )
                 return is_success, error_message
 
