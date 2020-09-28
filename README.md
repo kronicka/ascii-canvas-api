@@ -113,7 +113,8 @@ The current Canvas, fully filled with `-`, assuming previously empty Canvas:
     "errors": null
 } 
 ```  
-## Running Tests
+## Running Tests  
+Beware that the test are being run on each push or pull request to this repo, thanks to a Github Actions workflow.
 ### Running tests locally
 Running tests locally can be done via running the following command in the root of the repo:  
 `python3 -m pytest`  
