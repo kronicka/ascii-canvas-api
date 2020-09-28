@@ -4,6 +4,15 @@ Paint rectangles and flood fill shapes made out of characters on an [ASCII canva
 
 Spin up the server to manipulate the Canvas through RESTful endpoints and retrieve the modified Canvas back as a JSON.
 
+## Table of Contents
+- [Launch the server in a Docker](#launch-the-server-in-a-docker)
+- [Launch the server locally (MacOS)](#launch-the-server-locally-macos)
+- [API Endpoints](#api-endpoints)
+  * [Quick Reference](#quick-reference)
+  * [Full Reference](#full-reference)
+- [Running Tests](#running-tests)
+  * [Running tests locally](#running-tests-locally)
+  * [Running tests in a Docker](#running-tests-in-a-docker)
 
 ## Launch the server in a Docker
 
@@ -40,7 +49,7 @@ That's it!
 ## API Endpoints
 
 These are the endpoints to interact with via the client of your choice.  
-A Postman Collection for the following is available in `resources` directory.  
+A Postman Collection for the following is available in [`resources`](resources) directory.  
 ### Quick Reference
 * [**PUT** `/api/v1/canvas/paint`](#paint-a-rectangle) - Modify the Canvas by painting a Rectangle on it.
 * [**PUT** `/api/v1/canvas/fill`](#fill-an-area) - Modify the Canvas by filling an Area of points, starting at a specified point.
