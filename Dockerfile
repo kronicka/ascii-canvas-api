@@ -4,8 +4,6 @@ RUN mkdir /canvas
 WORKDIR /canvas
 
 COPY requirements.txt /canvas
-RUN pip install --upgrade pip && pip install virtualenv
-RUN virtualenv venv
-RUN . venv/bin/activate
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 COPY . /canvas
