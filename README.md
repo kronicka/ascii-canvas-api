@@ -1,6 +1,7 @@
 # ASCII Canvas API
 
-Paint rectangles and flood fill shapes made out of characters on an ASCII canvas.
+Paint rectangles and flood fill shapes made out of characters on an [ASCII canvas](https://user-images.githubusercontent.com/45996749/94438112-590b2180-01a7-11eb-8f0a-67ce202a0838.png) (click for a screenshot!).
+
 Spin up the server to manipulate the Canvas through RESTful endpoints and retrieve the modified Canvas back as a JSON.
 
 
