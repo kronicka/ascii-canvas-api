@@ -66,7 +66,7 @@ def test_canvas(paint_rectangle_args, fill_args, canvas_args, expected):
     )
 
     for params in paint_rectangle_args:
-        is_success, _ = canvas.paint_rectangle(
+        is_success, errors, _ = canvas.paint_rectangle(
             x=params.x,
             y=params.y,
             width=params.width,
@@ -74,10 +74,10 @@ def test_canvas(paint_rectangle_args, fill_args, canvas_args, expected):
             fill_symbol=params.fill_symbol,
             outline_symbol=params.outline_symbol
         )
-        assert is_success == True
+        assert is_success == True, errors
 
     if fill_args:
-        is_success, _ = canvas.fill_area(*fill_args)
-        assert is_success == True
+        is_success, errors, _ = canvas.fill_area(*fill_args)
+        assert is_success == True, errors
 
     assert np.array_equal(canvas.canvas, expected)

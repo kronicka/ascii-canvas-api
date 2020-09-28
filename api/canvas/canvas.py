@@ -1,6 +1,7 @@
 from collections import deque
-from typing import Tuple, Union
+from typing import Tuple, Optional
 import numpy as np
+from flask_api import status
 
 
 class Canvas:
@@ -16,14 +17,14 @@ class Canvas:
         :param cols:        width of the rectangle
         :param fill_symbol: the initial symbol to fill the canvas with
         """
-        self.rows: int = rows
-        self.cols: int = cols
+        self.__rows: int = rows
+        self.__cols: int = cols
 
         self.__painted_lowest_border: int = 0
         self.__painted_rightmost_border: int = 0
 
         self.canvas: np.array = np.array(
-            [[fill_symbol] * self.cols for _ in range(self.rows)]
+            [[fill_symbol] * self.__cols for _ in range(self.__rows)]
         )
 
     def __check_rectangle_in_range(
@@ -41,14 +42,7 @@ class Canvas:
 
         :return:          true if the rectangle can be added to the current canvas, false if not
         """
-        return (0 <= first_row and last_row < self.rows) and (0 <= first_col and last_col < self.cols)
-
-    def __calculate_canvas_size(self) -> Tuple[int, int]:
-        """
-        NOTE: This is a placeholder function for now.
-        Calculate the minimum desired size of the canvas based on the drawn rectangles.
-        """
-        pass
+        return (0 <= first_row and last_row < self.__rows) and (0 <= first_col and last_col < self.__cols)
 
     def __crop_canvas(self) -> None:
         """
@@ -58,9 +52,9 @@ class Canvas:
             # Return if no rectangles have previously been placed on the canvas
             return
 
-        self.rows = self.__painted_lowest_border
-        self.cols = self.__painted_rightmost_border
-        self.canvas = self.canvas[:self.rows, :self.cols]
+        self.__rows = self.__painted_lowest_border
+        self.__cols = self.__painted_rightmost_border
+        self.canvas = self.canvas[:self.__rows, :self.__cols]
 
     def __fill_vertical_borders(
         self,
@@ -102,7 +96,7 @@ class Canvas:
         self,
         x: int, y: int, width: int, height: int,
         fill_symbol: str = None, outline_symbol: str = None
-    ) -> Tuple[bool, Union[str, None]]:
+    ) -> Tuple[bool, Optional[str], int]:
         """
         Paint a rectangle on the canvas.
 
@@ -113,8 +107,9 @@ class Canvas:
         :param fill_symbol:    the symbol to fill in the rectangle with
         :param outline_symbol: the symbol for the outline
         """
-        is_success = False
-        error_message = None
+        is_success: bool = False
+        error_message: Optional[str] = None
+        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         first_row: int = y
         last_row: int = height + y - 1
@@ -131,16 +126,18 @@ class Canvas:
         if not in_range_check:
             error_message = (
                 f'This rectangle will not fit on the current canvas. '
-                f'Please specify the rectangle within this range: {self.cols}x{self.rows}'
+                f'Please specify the rectangle within this range: {self.__cols}x{self.__rows}'
             )
-            return is_success, error_message
+            status_code = status.HTTP_400_BAD_REQUEST
+            return is_success, error_message, status_code
 
         if not outline_symbol and not fill_symbol:
             error_message = (
                 'No outline or fill symbol has been specified for the rectangle. '
                 'Please specify fill_symbol or outline_symbol field.'
             )
-            return is_success, error_message
+            status_code = status.HTTP_400_BAD_REQUEST
+            return is_success, error_message, status_code
 
         try:
             # Keep track of the lowest rightmost border painted to be able to crop the canvas accordingly
@@ -168,26 +165,28 @@ class Canvas:
                     fill_symbol=outline_symbol
                 )
 
+                # These are needed to avoid filling the points already covered by adding vertical borders
                 first_col += 1
                 last_col -= 1
 
             if fill_symbol:
-                for curr_y in range(first_row, last_row + 1):
-                    for curr_x in range(first_col, last_col + 1):
-                        self.canvas[curr_y][curr_x] = fill_symbol
+                for row in range(first_row, last_row + 1):
+                    for col in range(first_col, last_col + 1):
+                        self.canvas[row][col] = fill_symbol
 
             is_success = True
+            status_code = status.HTTP_200_OK
 
         except Exception as e:
             error_message = f'Something went wrong while attempting to paint the rectangle. ' \
                             f'Details: {e}'
 
-        return is_success, error_message
+        return is_success, error_message, status_code
 
     def fill_area(
         self,
         x: int, y: int, fill_symbol: str
-    ) -> Tuple[bool, Union[str, None]]:
+    ) -> Tuple[bool, Optional[str], int]:
         """
         Fill an entity on the canvas with the specified symbol.
 
@@ -195,58 +194,62 @@ class Canvas:
         :param y:           y-coordinate of any point on the entity to fill in
         :param fill_symbol: the symbol to fill the entity with
         """
-        is_success = False
-        error_message = None
+        is_success: bool = False
+        error_message: Optional[str] = None
+        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         try:
-            if x < 0 or x >= self.cols or y < 0 or y >= self.rows:
+            if x < 0 or x >= self.__cols or y < 0 or y >= self.__rows:
                 error_message = (
-                    f'The canvas is {self.cols}x{self.rows}. Try passing valid coordinates :-)'
+                    f'The canvas is {self.__cols}x{self.__rows}. Try passing valid coordinates :-)'
                 )
-                return is_success, error_message
+                status_code = status.HTTP_400_BAD_REQUEST
+                return is_success, error_message, status_code
 
             initial_symbol: str = self.canvas[y][x]
 
             if initial_symbol == fill_symbol:
                 is_success = True  # No need to fill if the initial symbol matches the fill symbol.
-                return is_success, error_message
+                status_code = status.HTTP_200_OK
+                return is_success, error_message, status_code
 
             self.canvas[y][x] = fill_symbol
             neighbours: deque = deque()
             neighbours.append((y, x))
 
             while neighbours:
-                curr_y, curr_x = neighbours.popleft()
+                row, col = neighbours.popleft()
 
-                up: int = curr_y - 1
-                down: int = curr_y + 1
-                left: int = curr_x - 1
-                right: int = curr_x + 1
+                up: int = row - 1
+                down: int = row + 1
+                left: int = col - 1
+                right: int = col + 1
 
                 # Push the matching symbols onto the queue to see if they extend the filled area
-                if up >= 0 and self.canvas[up][curr_x] == initial_symbol:
-                    self.canvas[up][curr_x] = fill_symbol
-                    neighbours.append((up, curr_x))
+                if up >= 0 and self.canvas[up][col] == initial_symbol:
+                    self.canvas[up][col] = fill_symbol
+                    neighbours.append((up, col))
 
-                if down < self.rows and self.canvas[down][curr_x] == initial_symbol:
-                    self.canvas[down][curr_x] = fill_symbol
-                    neighbours.append((down, curr_x))
+                if down < self.__rows and self.canvas[down][col] == initial_symbol:
+                    self.canvas[down][col] = fill_symbol
+                    neighbours.append((down, col))
 
-                if left >= 0 and self.canvas[curr_y][left] == initial_symbol:
-                    self.canvas[curr_y][left] = fill_symbol
-                    neighbours.append((curr_y, left))
+                if left >= 0 and self.canvas[row][left] == initial_symbol:
+                    self.canvas[row][left] = fill_symbol
+                    neighbours.append((row, left))
 
-                if right < self.cols and self.canvas[curr_y][right] == initial_symbol:
-                    self.canvas[curr_y][right] = fill_symbol
-                    neighbours.append((curr_y, right))
+                if right < self.__cols and self.canvas[row][right] == initial_symbol:
+                    self.canvas[row][right] = fill_symbol
+                    neighbours.append((row, right))
 
             is_success = True
+            status_code = status.HTTP_200_OK
 
         except Exception as e:
             error_message = f'Something went wrong while filling an area. ' \
                             f'Details: {e}'
 
-        return is_success, error_message
+        return is_success, error_message, status_code
 
     def clear_canvas(self, fill_symbol: str = ' '):
         """
@@ -255,14 +258,14 @@ class Canvas:
         :param fill_symbol: an optional symbol to fill all canvas with
         """
         self.canvas = np.array(
-            [[fill_symbol] * self.cols for _ in range(self.rows)]
+            [[fill_symbol] * self.__cols for _ in range(self.__rows)]
         )
 
     def print_canvas(self) -> None:
         """
         Print the contents of the current canvas.
         """
-        for row in range(self.rows):
-            for col in range(self.cols):
+        for row in range(self.__rows):
+            for col in range(self.__cols):
                 print(self.canvas[row][col], end=' ')
             print('\r')

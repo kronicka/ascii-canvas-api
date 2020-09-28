@@ -1,4 +1,4 @@
-from typing import NamedTuple, Union
+from typing import NamedTuple, Optional
 import numpy as np
 from pathlib import Path
 
@@ -12,8 +12,8 @@ class Rectangle(NamedTuple):
     y: int
     width: int
     height: int
-    fill_symbol: Union[str, None]
-    outline_symbol: Union[str, None]
+    fill_symbol: Optional[str]
+    outline_symbol: Optional[str]
 
 
 class Fill(NamedTuple):
@@ -33,7 +33,7 @@ def load_fixture(file_path: Path) -> np.array:
     Load the appropriate Canvas fixture for testing.
 
     :param file_path: the location of the fixture
-    :return:          a numpy array loaded from a CVS file
+    :return:          a numpy array loaded from a CSV file
     """
     if not file_path.exists():
         return

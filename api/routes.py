@@ -13,7 +13,6 @@ from api.schemas import RectangleSchema, CanvasSchema, FillOperationSchema
 from app import canvas, strict_redis
 
 from flask import Response, request, make_response, render_template
-from flask_api import status
 
 
 CANVAS_FILE_PATH: Path = Path(__file__).parent / 'canvas/canvas.csv'
@@ -114,7 +113,7 @@ def paint_rectangle() -> Tuple[Response, int]:
 
     rectangle: dict = rect_schema.load(json_payload)
 
-    is_success, errors = canvas.paint_rectangle(
+    is_success, errors, status_code = canvas.paint_rectangle(
         x=rectangle['x'],
         y=rectangle['y'],
         width=rectangle['width'],
@@ -126,7 +125,7 @@ def paint_rectangle() -> Tuple[Response, int]:
     if not is_success:
         response_data['errors'] = errors
         return make_response(
-            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+            response_data, status_code
         )
 
     # Return a serialized JSON version of the canvas with the REST response
@@ -138,7 +137,7 @@ def paint_rectangle() -> Tuple[Response, int]:
         message=json.dumps(json_canvas['canvas'])
     )
     response: Tuple[Response, int] = make_response(
-        response_data, status.HTTP_200_OK
+        response_data, status_code
     )
 
     return response
@@ -163,7 +162,7 @@ def fill_area() -> Tuple[Response, int]:
 
     fill: dict = fill_schema.load(json_payload)
 
-    is_success, errors = canvas.fill_area(
+    is_success, errors, status_code = canvas.fill_area(
         x=fill['x'],
         y=fill['y'],
         fill_symbol=fill['fill_symbol']
@@ -172,7 +171,7 @@ def fill_area() -> Tuple[Response, int]:
     if not is_success:
         response_data['errors'] = errors
         return make_response(
-            response_data, status.HTTP_500_INTERNAL_SERVER_ERROR
+            response_data, status_code
         )
 
     # Return a serialized JSON version of the canvas with the REST response
@@ -183,6 +182,6 @@ def fill_area() -> Tuple[Response, int]:
         channel='canvas_changes',
         message=json.dumps(json_canvas['canvas'])
     )
-    response: Tuple[Response, int] = make_response(response_data, status.HTTP_200_OK)
+    response: Tuple[Response, int] = make_response(response_data, status_code)
 
     return response
