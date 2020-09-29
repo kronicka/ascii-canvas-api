@@ -11,8 +11,8 @@ Spin up the server to manipulate the Canvas through RESTful endpoints and retrie
   * [Quick Reference](#quick-reference)
   * [Full Reference](#full-reference)
 - [Running Tests](#running-tests)
-  * [Running tests locally](#running-tests-locally)
   * [Running tests in a Docker](#running-tests-in-a-docker)
+  * [Running tests locally](#running-tests-locally)
 
 ## Launch the server in a Docker
 
@@ -125,11 +125,11 @@ The current Canvas, fully filled with `-`, assuming previously empty Canvas:
 ```  
 ## Running Tests  
 Beware that the test are being run on each push or pull request to this repo, thanks to a Github Actions workflow.
+### Running tests in a Docker
+Running test with the Docker set up can be done via running the following command:  
+`docker exec -it canvas_api python3 -m pytest`
+> **NOTE**: This is assuming the server was set up correctly, using Docker, and the `canvas_api` container is running.  
 ### Running tests locally
 Running tests locally can be done via running the following command in the root of the repo:  
 `python3 -m pytest`  
 > **NOTE**: This is assuming the server was set up correctly, and the virtualenv is activated.
-### Running tests in a Docker
-Running test with the Docker set up can be done via running the following command:  
-`docker exec -it canvas_api python3 -m pytest`
-> **NOTE**: This is assuming the server was set up correctly, using Docker, and the `canvas_api` container is running.
