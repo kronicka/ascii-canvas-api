@@ -9,13 +9,13 @@ ma = Marshmallow()
 class FlaskAppFactory:
     """ A Factory class to create a configured Flask REST application object. """
     @classmethod
-    def create_app(cls) -> Flask:
+    def create_app(cls, config_env='config.Config') -> Flask:
         """
         Create a Flask application object with the specified configs, extensions, and blueprints.
         """
         app = Flask(__name__)
 
-        environment_config: str = os.environ.get('CONFIGURATION_ENV', 'config.Config')
+        environment_config: str = os.environ.get('CONFIGURATION_ENV', config_env)
         app.config.from_object(environment_config)
 
         CORS(app)

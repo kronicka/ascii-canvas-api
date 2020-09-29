@@ -1,52 +1,8 @@
-from api.canvas.canvas import Canvas
-from tests.helpers import load_fixture, Rectangle, Fill, CanvasParams
-
-from pathlib import Path
 import pytest
 import numpy as np
 
-
-fixture_path_1: Path = Path(__file__).parent / 'fixtures/expected_canvas_1.csv'
-fixture_path_2: Path = Path(__file__).parent / 'fixtures/expected_canvas_2.csv'
-fixture_path_3: Path = Path(__file__).parent / 'fixtures/expected_canvas_3.csv'
-
-
-expected_fixture_1: np.array = load_fixture(fixture_path_1)
-expected_fixture_2: np.array = load_fixture(fixture_path_2)
-expected_fixture_3: np.array = load_fixture(fixture_path_3)
-
-
-fixture_1 = (
-    [
-        Rectangle(3, 2, 5, 3, 'X', '@'),
-        Rectangle(10, 3, 14, 6, 'O', 'X')
-    ],
-    None,
-    CanvasParams(9, 24, ' '),
-    expected_fixture_1
-)
-
-fixture_2 = (
-    [
-        Rectangle(14, 0, 7, 6, '.', None),
-        Rectangle(0, 3, 8, 4, None, 'O'),
-        Rectangle(5, 5, 5, 3, 'X', 'X')
-    ],
-    None,
-    CanvasParams(8, 21, ' '),
-    expected_fixture_2
-)
-
-fixture_3 = (
-    [
-        Rectangle(14, 0, 7, 6, '.', None),
-        Rectangle(0, 3, 8, 4, None, 'O'),
-        Rectangle(5, 5, 5, 3, 'X', 'X')
-    ],
-    Fill(0, 0, '-'),
-    CanvasParams(8, 21, ' '),
-    expected_fixture_3
-)
+from api.canvas.canvas import Canvas
+from tests.params import fixture_1, fixture_2, fixture_3
 
 
 @pytest.mark.parametrize(

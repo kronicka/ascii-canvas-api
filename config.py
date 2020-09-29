@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class Config(object):
     """
     Generic Flask App configuration object.
@@ -11,6 +14,8 @@ class Config(object):
 
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
+
+    CANVAS_FILE_PATH: Path = Path(__file__).parent / 'api/canvas/canvas.csv'
 
 
 class DockerConfig(Config):
@@ -34,3 +39,4 @@ class TestingConfig(Config):
     Flask config variables for running auto-tests.
     """
     TESTING = True
+    CANVAS_FILE_PATH: Path = Path(__file__).parent / 'tests/fixtures/test_canvas.csv'

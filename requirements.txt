@@ -22,6 +22,6 @@ redis
 
 
 # Testing
-pytest
 fakeredis
+pytest
 pytest_mock

@@ -3,6 +3,7 @@ from typing import Tuple
 
 from marshmallow_dataclass import class_schema
 from marshmallow import Schema
+from marshmallow.exceptions import ValidationError
 from pathlib import Path
 
 from numpy import loadtxt, savetxt
@@ -12,10 +13,8 @@ from api.helpers.sse_events import event_stream
 from api.schemas import RectangleSchema, CanvasSchema, FillOperationSchema
 from app import canvas, strict_redis
 
-from flask import Response, request, make_response, render_template
-
-
-CANVAS_FILE_PATH: Path = Path(__file__).parent / 'canvas/canvas.csv'
+from flask import current_app, Response, request, make_response, render_template
+from flask_api import status
 
 
 @canvas_api.before_app_first_request
@@ -26,12 +25,14 @@ def load_existing_canvas() -> None:
     NOTE:   Delimiters and comments are non-ASCII characters, so that they are not confused
           with symbols on the Canvas.
     """
-    if not CANVAS_FILE_PATH.exists():
+    canvas_file_path: Path = current_app.config.get('CANVAS_FILE_PATH')
+
+    if not canvas_file_path.exists():
         return
 
     try:
         canvas.canvas = loadtxt(
-            str(CANVAS_FILE_PATH),
+            str(canvas_file_path),
             dtype='<U1',
             delimiter='¬',
             comments='¤'
@@ -52,8 +53,10 @@ def save_canvas_after_request(response: Response) -> Response:
     NOTE:   Delimiters and comments are non-ASCII characters, so that they are not confused
           with symbols on the Canvas.
     """
+    canvas_file_path: Path = current_app.config.get('CANVAS_FILE_PATH')
+
     savetxt(
-        str(CANVAS_FILE_PATH),
+        str(canvas_file_path),
         canvas.canvas,
         header='This is a CSV representation of the latest Canvas.',
         fmt='%s',
@@ -108,10 +111,20 @@ def paint_rectangle() -> Tuple[Response, int]:
         'errors': None
     }
 
+    # Instantiate appropriate validation schemas
     rect_schema: RectangleSchema = RectangleSchema()
     canvas_schema: Schema = class_schema(CanvasSchema)()
 
-    rectangle: dict = rect_schema.load(json_payload)
+    try:
+        rectangle: dict = rect_schema.load(json_payload)
+
+    except ValidationError as e:
+        response_data['errors'] = f'Request payload validation failed. ' \
+                                  f'Details: {e}'
+        status_code = status.HTTP_400_BAD_REQUEST
+        return make_response(
+            response_data, status_code
+        )
 
     is_success, errors, status_code = canvas.paint_rectangle(
         x=rectangle['x'],
@@ -129,12 +142,12 @@ def paint_rectangle() -> Tuple[Response, int]:
         )
 
     # Return a serialized JSON version of the canvas with the REST response
-    json_canvas: dict = canvas_schema.dump(canvas)
-    response_data['data'] = json_canvas['canvas']['data']
+    json_canvas: dict = canvas_schema.dump(canvas).get('canvas')
+    response_data['data'] = json_canvas['data']
 
     strict_redis.publish(
         channel='canvas_changes',
-        message=json.dumps(json_canvas['canvas'])
+        message=json.dumps(json_canvas)
     )
     response: Tuple[Response, int] = make_response(
         response_data, status_code
@@ -157,10 +170,20 @@ def fill_area() -> Tuple[Response, int]:
         'errors': None
     }
 
+    # Instantiate appropriate validation schemas
     fill_schema: FillOperationSchema = FillOperationSchema()
     canvas_schema: Schema = class_schema(CanvasSchema)()
 
-    fill: dict = fill_schema.load(json_payload)
+    try:
+        fill: dict = fill_schema.load(json_payload)
+
+    except ValidationError as e:
+        response_data['errors'] = f'Request payload validation failed. ' \
+                                  f'Details: {e}'
+        status_code = status.HTTP_400_BAD_REQUEST
+        return make_response(
+            response_data, status_code
+        )
 
     is_success, errors, status_code = canvas.fill_area(
         x=fill['x'],
@@ -175,12 +198,12 @@ def fill_area() -> Tuple[Response, int]:
         )
 
     # Return a serialized JSON version of the canvas with the REST response
-    json_canvas: dict = canvas_schema.dump(canvas)
-    response_data['data'] = json_canvas['canvas']['data']
+    json_canvas: dict = canvas_schema.dump(canvas).get('canvas')
+    response_data['data'] = json_canvas['data']
 
     strict_redis.publish(
         channel='canvas_changes',
-        message=json.dumps(json_canvas['canvas'])
+        message=json.dumps(json_canvas)
     )
     response: Tuple[Response, int] = make_response(response_data, status_code)
 

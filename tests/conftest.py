@@ -13,7 +13,7 @@ def app(mocker):
     fake_redis = fakeredis.FakeStrictRedis(server=server)
     mocker.patch('redis.StrictRedis', return_value=fake_redis)
 
-    flask_app = CanvasAPI.create_app()
+    flask_app = CanvasAPI.create_app('config.TestingConfig')
     yield flask_app
 
 
@@ -22,4 +22,5 @@ def client(app):
     """
     Create a Flask test client instance to make test API calls.
     """
-    return app.test_client()
+    test_client = app.test_client()
+    return test_client
