@@ -250,22 +250,3 @@ class Canvas:
                             f'Details: {e}'
 
         return is_success, error_message, status_code
-
-    def clear_canvas(self, fill_symbol: str = ' '):
-        """
-        Clear the entirety of canvas.
-
-        :param fill_symbol: an optional symbol to fill all canvas with
-        """
-        self.canvas = np.array(
-            [[fill_symbol] * self.__cols for _ in range(self.__rows)]
-        )
-
-    def print_canvas(self) -> None:
-        """
-        Print the contents of the current canvas.
-        """
-        for row in range(self.__rows):
-            for col in range(self.__cols):
-                print(self.canvas[row][col], end=' ')
-            print('\r')
