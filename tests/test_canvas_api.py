@@ -5,7 +5,6 @@ import pytest
 from config import TestingConfig
 from flask import Response
 from tests import params
-from pathlib import Path
 
 
 @pytest.fixture(autouse=True)
@@ -14,8 +13,9 @@ def remove_canvas_file_after_tests():
     Removes the generated Test Canvas after the tests were run.
     """
     yield
-    test_file_path: Path = TestingConfig.CANVAS_FILE_PATH
-    os.remove(str(test_file_path))
+    test_file_path: str = str(TestingConfig.CANVAS_FILE_PATH)
+    if os.path.exists(test_file_path):
+        os.remove(test_file_path)
 
 
 def test_main_page(app, client):
