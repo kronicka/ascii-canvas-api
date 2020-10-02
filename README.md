@@ -124,7 +124,7 @@ The current Canvas, fully filled with `-`, assuming previously empty Canvas:
 } 
 ```  
 ## Running Tests  
-Beware that the test are being run on each push or pull request to this repo, thanks to a Github Actions workflow.
+Beware that the tests are being run on each push or pull request to this repo, thanks to a Github Actions workflow.
 ### Running tests in a Docker
 Running test with the Docker set up can be done via running the following command:  
 `docker exec -it canvas_api python3 -m pytest`

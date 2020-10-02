@@ -64,11 +64,11 @@ class Canvas:
         """
         Fill the leftmost and the rightmost border of a rectangle with an outline.
 
-        :param start:            y-position of each first element in the column
-        :param end:              y-position of each last element in the column
-        :param leftmost_border:  x-position of the first column to fill
-        :param rightmost_border: x-position of the last column to fill
-        :param fill_symbol:      symbol to fill the column with
+        :param start:            the start (highest) y-coordinate of a vertical border
+        :param end:              the end (lowest) y-coordinate of a vertical border
+        :param leftmost_border:  the x-coordinate of the leftmost vertical border
+        :param rightmost_border: the x-coordinate of the rightmost vertical border
+        :param fill_symbol:      symbol to fill the border with
         """
         for char in range(start, end + 1):
             self.canvas[char][leftmost_border] = fill_symbol
@@ -82,11 +82,11 @@ class Canvas:
         """
         Fill the upper and the lower border of a rectangle with an outline.
 
-        :param start:        start position of the line to fill in
-        :param end:          end position of the line to fill in
-        :param upper_border: number of the top line to fill in
-        :param lower_border: number of the bottom line to fill in
-        :param fill_symbol:  symbol to fill the line with
+        :param start:        the start (leftmost) x-coordinate of a horizontal border
+        :param end:          the end (rightmost) x-coordinate of a horizontal border
+        :param upper_border: the y-coordinate of the upper horizontal border
+        :param lower_border: the y-coordinate of the lower horizontal border
+        :param fill_symbol:  symbol to fill the border with
         """
         for char in range(start, end + 1):
             self.canvas[upper_border][char] = fill_symbol
