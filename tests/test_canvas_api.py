@@ -10,7 +10,7 @@ from tests import params
 @pytest.fixture(autouse=True)
 def remove_canvas_file_after_tests():
     """
-    Removes the generated Test Canvas after the tests were run.
+    Remove the generated Test Canvas after the tests were run.
     """
     yield
     test_file_path: str = str(TestingConfig.CANVAS_FILE_PATH)
@@ -37,9 +37,12 @@ def test_main_page(app, client):
         params.paint_rectangle_fail_payload_3
     ]
 )
-def test_put_paint_rectangle(app, client, payload_args, expected_status_code):
+def test_put_paint_rectangle(
+        app, client,
+        payload_args: dict, expected_status_code: int
+) -> None:
     """
-    A simple API Test for the Paint Rectangle Endpoint.
+    Test the API call to the Paint Rectangle Endpoint.
     """
     endpoint_url: str = '/api/v1/canvas/paint'
 
@@ -63,9 +66,12 @@ def test_put_paint_rectangle(app, client, payload_args, expected_status_code):
         params.fill_fail_payload_2
     ]
 )
-def test_put_fill_area(app, client, payload_args, expected_status_code):
+def test_put_fill_area(
+        app, client,
+        payload_args: dict, expected_status_code: int
+) -> None:
     """
-    A simple API Test for the Fill an Area Endpoint.
+    Test the API call to the Fill an Area Endpoint.
     """
     endpoint_url: str = '/api/v1/canvas/fill'
 

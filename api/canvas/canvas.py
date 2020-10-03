@@ -4,7 +4,7 @@ import numpy as np
 from flask_api import status
 
 
-class Canvas:
+class Canvas(object):
     """ A class representing an ASCII canvas. """
     def __init__(
             self,

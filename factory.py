@@ -3,10 +3,10 @@ from flask import Flask
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 
-ma = Marshmallow()
+ma: Marshmallow = Marshmallow()
 
 
-class FlaskAppFactory:
+class FlaskAppFactory(object):
     """ A Factory class to create a configured Flask REST application object. """
     @classmethod
     def create_app(cls, config_env='config.Config') -> Flask:

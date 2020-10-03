@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
+from typing import Optional
 
 from api.canvas.canvas import Canvas
+from tests.helpers import Fill, CanvasParams
 from tests.params import fixture_1, fixture_2, fixture_3
 
 
@@ -13,7 +15,10 @@ from tests.params import fixture_1, fixture_2, fixture_3
         fixture_3
     ]
 )
-def test_canvas(paint_rectangle_args, fill_args, canvas_args, expected):
+def test_canvas(
+        paint_rectangle_args: list, fill_args: Optional[Fill],
+        canvas_args: CanvasParams, expected: np.array
+) -> None:
     """
     Test given fixtures to make sure that methods in Canvas class behave as expected.
     """

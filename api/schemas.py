@@ -37,11 +37,11 @@ class RectangleSchema(ma.Schema):
     )
 
     fill_symbol = fields.String(
-        validate=Length(min=1, max=1),
+        validate=Length(equal=1),
         allow_none=True
     )
     outline_symbol = fields.String(
-        validate=Length(min=1, max=1),
+        validate=Length(equal=1),
         allow_none=True
     )
 
@@ -59,6 +59,6 @@ class FillOperationSchema(ma.Schema):
         allow_none=False
     )
     fill_symbol = fields.String(
-        validate=Length(min=1, max=1),
+        validate=Length(equal=1),
         required=True
     )

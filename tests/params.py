@@ -1,9 +1,9 @@
-import numpy as np
-
 from flask_api import status
+import numpy as np
+from pathlib import Path
+
 from tests.helpers import load_fixture, Rectangle, Fill, CanvasParams
 
-from pathlib import Path
 
 """
 Parameters for Canvas Unit Tests
